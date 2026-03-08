@@ -3,322 +3,834 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Human-Readable Report — Fairtrust AI</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <title>Human-Readable Report — FairTrust AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary: #4F46E5; --primary-soft: #EEF2FF;
-            --success: #059669; --success-light: #D1FAE5;
-            --warning: #D97706; --warning-light: #FEF3C7;
-            --danger: #DC2626; --danger-light: #FEE2E2;
-            --bg: #FAFBFC; --surface: #FFFFFF;
-            --text: #1E293B; --text-muted: #64748B; --border: #E2E8F0;
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
         }
+        
+        :root {
+            --primary: #1A2D4E;      /* Deep Navy - dominant */
+            --primary-light: #2A3F66;
+            --primary-soft: #E9ECF3;  /* Soft navy-tinted background */
+            --secondary: #EBB255;     /* Gold/Amber - minimal accents */
+            --accent: #4A90E2;        /* Soft Blue */
+            --success: #059669;
+            --success-light: rgba(5, 150, 105, 0.12);
+            --warning: #D97706;
+            --warning-light: rgba(217, 119, 6, 0.12);
+            --danger: #DC2626;
+            --danger-light: rgba(220, 38, 38, 0.12);
+            --bg: #F5F6FA;
+            --surface: #FFFFFF;
+            --text: #1A2D4E;
+            --text-muted: #5A6169;
+            --border: #E4E7F0;
+            --shadow: 0 10px 30px rgba(26, 45, 78, 0.08);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
         body {
-            font-family: 'DM Sans', -apple-system, sans-serif;
-            background: linear-gradient(180deg, var(--bg) 0%, #F1F5F9 100%);
+            background: linear-gradient(180deg, var(--bg) 0%, #E9ECF3 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 3rem 1rem;
+            padding: 2rem 1rem;
             color: var(--text);
             line-height: 1.6;
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        }
+
+        /* ================= NAVBAR ================= */
+        .navbar {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 16px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(235, 178, 85, 0.15);
+            margin-bottom: 2rem;
+        }
+
+        .navbar.scrolled {
+            padding: 12px 5%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: var(--primary);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #4A90E2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(26, 45, 78, 0.2);
+            transition: var(--transition);
+        }
+
+        .logo:hover .logo-icon {
+            transform: rotate(5deg) scale(1.05);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .logo-text span {
+            color: var(--secondary);
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--secondary);
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            position: relative;
+            padding: 8px 0;
+            transition: var(--transition);
+        }
+
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--secondary);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+
+        .nav-links a.active {
+            color: var(--secondary);
+        }
+
+        .nav-links a.active:after {
+            width: 100%;
         }
 
         /* Back link */
-        .back-bar { width: 100%; max-width: 640px; margin-bottom: 1rem; font-size: 0.875rem; }
-        .back-bar a { color: var(--primary); text-decoration: none; font-weight: 600; }
-        .back-bar a:hover { text-decoration: underline; }
+        .back-bar { 
+            width: 100%; 
+            max-width: 640px; 
+            margin-bottom: 1rem; 
+            font-size: 0.875rem; 
+        }
+        
+        .back-bar a { 
+            color: var(--secondary); 
+            text-decoration: none; 
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: var(--transition);
+        }
+        
+        .back-bar a:hover { 
+            color: var(--primary);
+            transform: translateX(-3px);
+        }
 
         .report-container {
-            max-width: 640px; width: 100%;
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 16px; padding: 2.5rem;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.07), 0 4px 6px -2px rgba(0,0,0,0.05);
+            max-width: 640px; 
+            width: 100%;
+            background: var(--surface); 
+            border: 2px solid rgba(26, 45, 78, 0.08);
+            border-radius: var(--radius); 
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
         }
-        .section-spacer { margin-bottom: 2.5rem; }
+
+        .report-container:hover {
+            border-color: rgba(26, 45, 78, 0.15);
+            box-shadow: 0 15px 35px rgba(26, 45, 78, 0.12);
+        }
+
+        .section-spacer { 
+            margin-bottom: 2.5rem; 
+        }
 
         /* State card */
-        .state-card { text-align: center; padding: 2rem 0; }
-        .state-card h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
-        .state-card p { color: var(--text-muted); margin-bottom: 1.5rem; }
+        .state-card { 
+            text-align: center; 
+            padding: 3rem 0; 
+        }
+        
+        .state-card h2 { 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            color: var(--primary);
+            margin-bottom: 0.75rem; 
+        }
+        
+        .state-card p { 
+            color: var(--text-muted); 
+            margin-bottom: 1.5rem; 
+        }
 
         /* Header */
-        .report-header { text-align: center; margin-bottom: 2.5rem; }
-        .outcome-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .outcome-fair     { color: var(--success); }
-        .outcome-partial  { color: var(--warning); }
-        .outcome-concern  { color: var(--danger); }
-        .outcome-sub { color: var(--text-muted); font-size: 0.9375rem; margin-bottom: 0.75rem; }
+        .report-header { 
+            text-align: center; 
+            margin-bottom: 2.5rem; 
+        }
+        
+        .outcome-title { 
+            font-size: 2rem; 
+            font-weight: 800; 
+            margin-bottom: 0.75rem; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .outcome-fair     { 
+            color: var(--success); 
+        }
+        
+        .outcome-partial  { 
+            color: var(--warning); 
+        }
+        
+        .outcome-concern  { 
+            color: var(--danger); 
+        }
+        
+        .outcome-sub { 
+            color: var(--text-muted); 
+            font-size: 0.9375rem; 
+            margin-bottom: 1rem; 
+        }
+        
         .confidence-badge {
-            display: inline-block; padding: 0.35rem 1rem;
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 999px; font-size: 0.875rem; color: var(--text-muted);
+            display: inline-flex; 
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            background: var(--primary-soft); 
+            border: 1px solid rgba(26, 45, 78, 0.15);
+            border-radius: 999px; 
+            font-size: 0.875rem; 
+            color: var(--primary);
+        }
+
+        .confidence-badge i {
+            color: var(--secondary);
         }
 
         /* Factor list */
-        .explanation-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; }
-        .factor-list { list-style: none; }
+        .explanation-title { 
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .explanation-title:after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .factor-list { 
+            list-style: none; 
+        }
+        
         .factor-item {
-            display: flex; align-items: flex-start; gap: 1rem;
-            padding: 1rem; background: var(--surface); border: 1px solid var(--border);
-            border-radius: 10px; margin-bottom: 0.75rem;
-            transition: all 0.2s ease-in-out;
+            display: flex; 
+            align-items: flex-start; 
+            gap: 1rem;
+            padding: 1.25rem; 
+            background: var(--surface); 
+            border: 2px solid rgba(26, 45, 78, 0.08);
+            border-radius: 10px; 
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
         }
-        .factor-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79,70,229,0.08); border-color: var(--primary); }
+        
+        .factor-item:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(26, 45, 78, 0.1); 
+            border-color: var(--secondary); 
+        }
+        
         .factor-icon {
-            width: 40px; height: 40px; background: var(--primary-soft); color: var(--primary);
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.25rem; flex-shrink: 0;
+            width: 40px; 
+            height: 40px; 
+            background: rgba(235, 178, 85, 0.1); 
+            color: var(--secondary);
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 1.25rem; 
+            flex-shrink: 0;
+            transition: var(--transition);
         }
-        .factor-icon.warning { background: var(--warning-light); color: var(--warning); }
-        .factor-details { flex: 1; }
-        .factor-name { font-weight: 600; font-size: 0.9375rem; }
-        .factor-detail { font-size: 0.8125rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.5; }
+
+        .factor-item:hover .factor-icon {
+            background: var(--secondary);
+            color: white;
+            transform: rotate(5deg);
+        }
+        
+        .factor-icon.warning { 
+            background: var(--warning-light); 
+            color: var(--warning); 
+        }
+        
+        .factor-details { 
+            flex: 1; 
+        }
+        
+        .factor-name { 
+            font-weight: 700; 
+            font-size: 0.9375rem; 
+            color: var(--primary);
+        }
+        
+        .factor-detail { 
+            font-size: 0.8125rem; 
+            color: var(--text-muted); 
+            margin-top: 0.2rem; 
+            line-height: 1.5; 
+        }
+        
         .factor-status {
-            font-size: 1rem; font-weight: 700; width: 32px; height: 32px; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; margin-left: auto; align-self: center;
+            font-size: 1rem; 
+            font-weight: 700; 
+            width: 32px; 
+            height: 32px; 
+            flex-shrink: 0;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            border-radius: 50%; 
+            margin-left: auto; 
+            align-self: center;
         }
-        .factor-status.approved { color: var(--success); background: var(--success-light); }
-        .factor-status.rejected { color: var(--danger); background: var(--danger-light); }
+        
+        .factor-status.approved { 
+            color: var(--success); 
+            background: var(--success-light); 
+        }
+        
+        .factor-status.rejected { 
+            color: var(--danger); 
+            background: var(--danger-light); 
+        }
 
         /* Bias indicators */
         .bias-check {
-            background: var(--warning-light); border: 1px solid #F59E0B;
-            border-radius: 12px; padding: 1.5rem; margin-bottom: 2.5rem;
+            background: var(--warning-light); 
+            border-left: 4px solid var(--warning);
+            border-radius: 0 12px 12px 0; 
+            padding: 1.5rem; 
+            margin-bottom: 2.5rem;
         }
-        .bias-check.clean { background: var(--success-light); border-color: #6EE7B7; }
-        .bias-icon { font-size: 1.75rem; margin-bottom: 0.4rem; }
-        .bias-title { font-size: 1.0625rem; font-weight: 600; margin-bottom: 0.75rem; color: #92400E; }
-        .bias-check.clean .bias-title { color: var(--success); }
-        .bias-list { list-style: none; }
+        
+        .bias-check.clean { 
+            background: var(--success-light); 
+            border-left-color: var(--success); 
+        }
+        
+        .bias-icon { 
+            font-size: 2rem; 
+            margin-bottom: 0.5rem; 
+        }
+        
+        .bias-title { 
+            font-size: 1.125rem; 
+            font-weight: 700; 
+            margin-bottom: 0.75rem; 
+            color: #92400E; 
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bias-title i {
+            color: var(--warning);
+        }
+        
+        .bias-check.clean .bias-title { 
+            color: var(--success); 
+        }
+
+        .bias-check.clean .bias-title i {
+            color: var(--success);
+        }
+        
+        .bias-list { 
+            list-style: none; 
+        }
+        
         .bias-list li {
-            position: relative; padding-left: 1.25rem;
-            font-size: 0.875rem; color: #92400E; margin-bottom: 0.5rem; line-height: 1.6;
+            position: relative; 
+            padding-left: 1.5rem;
+            font-size: 0.875rem; 
+            color: #92400E; 
+            margin-bottom: 0.5rem; 
+            line-height: 1.6;
         }
-        .bias-list li:last-child { margin-bottom: 0; }
-        .bias-list li::before { content: '▸'; position: absolute; left: 0; font-weight: 700; color: var(--warning); }
-        .bias-check.clean .bias-list li { color: var(--success); }
-        .bias-check.clean .bias-list li::before { color: var(--success); }
+        
+        .bias-list li:last-child { 
+            margin-bottom: 0; 
+        }
+        
+        .bias-list li::before { 
+            content: '▸'; 
+            position: absolute; 
+            left: 0; 
+            font-weight: 700; 
+            color: var(--warning); 
+        }
+        
+        .bias-check.clean .bias-list li { 
+            color: var(--success); 
+        }
+        
+        .bias-check.clean .bias-list li::before { 
+            color: var(--success); 
+        }
 
         /* What this means */
-        .action-section { margin-bottom: 2.5rem; }
-        .action-summary { color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9375rem; line-height: 1.6; }
-        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin: 1rem 0; }
-        .action-card {
-            background: var(--surface); padding: 1.25rem 1rem;
-            border-radius: 10px; text-align: center; border: 1px solid var(--border);
-            transition: all 0.2s ease-in-out;
+        .action-section { 
+            margin-bottom: 2.5rem; 
         }
-        .action-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(79,70,229,0.08); border-color: var(--primary); }
-        .action-icon { font-size: 1.75rem; margin-bottom: 0.6rem; line-height: 1; }
-        .action-card h3 { font-size: 0.9375rem; font-weight: 600; margin-bottom: 0.3rem; }
-        .action-text { color: var(--text-muted); font-size: 0.8125rem; line-height: 1.4; }
+        
+        .action-summary { 
+            color: var(--text-muted); 
+            margin-bottom: 1.5rem; 
+            font-size: 0.9375rem; 
+            line-height: 1.6; 
+        }
+        
+        .action-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+            gap: 1rem; 
+            margin: 1.5rem 0; 
+        }
+        
+        .action-card {
+            background: var(--surface); 
+            padding: 1.5rem 1rem;
+            border-radius: 10px; 
+            text-align: center; 
+            border: 2px solid rgba(26, 45, 78, 0.08);
+            transition: var(--transition);
+        }
+        
+        .action-card:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 4px 12px rgba(26, 45, 78, 0.1); 
+            border-color: var(--secondary); 
+        }
+        
+        .action-icon { 
+            font-size: 2rem; 
+            margin-bottom: 0.75rem; 
+            line-height: 1;
+            color: var(--secondary);
+        }
+        
+        .action-card h3 { 
+            font-size: 0.9375rem; 
+            font-weight: 700; 
+            color: var(--primary);
+            margin-bottom: 0.3rem; 
+        }
+        
+        .action-text { 
+            color: var(--text-muted); 
+            font-size: 0.8125rem; 
+            line-height: 1.4; 
+        }
 
         /* Recommendations */
-        .recs-section { margin-bottom: 0.5rem; }
-        .print-btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-            width: 100%; padding: 0.85rem; background: var(--primary); color: white;
-            border: none; border-radius: 8px; font-size: 0.9375rem; font-weight: 600;
-            cursor: pointer; transition: all 0.2s; margin-top: 1.5rem; font-family: inherit;
+        .recs-section { 
+            margin-bottom: 0.5rem; 
         }
-        .print-btn:hover { background: #4338CA; }
+        
+        .print-btn {
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.5rem;
+            width: 100%; 
+            padding: 1rem; 
+            background: linear-gradient(135deg, var(--primary), #2c3e50); 
+            color: white;
+            border: none; 
+            border-radius: 8px; 
+            font-size: 0.9375rem; 
+            font-weight: 700;
+            cursor: pointer; 
+            transition: var(--transition); 
+            margin-top: 1.5rem; 
+            font-family: inherit;
+            box-shadow: 0 4px 15px rgba(26, 45, 78, 0.2);
+        }
+        
+        .print-btn:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 45, 78, 0.3);
+        }
 
-        .btn { padding: 0.65rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s; border: none; font-family: inherit; display: inline-flex; align-items: center; gap: 0.5rem; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: #4338CA; }
+        .print-btn i {
+            color: var(--secondary);
+        }
+
+        .btn { 
+            padding: 0.7rem 1.5rem; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            font-size: 0.875rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            border: 2px solid transparent; 
+            font-family: inherit; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), #2c3e50); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(26, 45, 78, 0.2);
+        }
+        
+        .btn-primary:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 45, 78, 0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .report-container {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
 
         @media print {
-            body { background: white; padding: 0; }
-            .back-bar { display: none; }
-            .print-btn { display: none; }
-            .report-container { box-shadow: none; border: none; }
+            body { 
+                background: white; 
+                padding: 0; 
+            }
+            .navbar, .back-bar { 
+                display: none; 
+            }
+            .print-btn { 
+                display: none; 
+            }
+            .report-container { 
+                box-shadow: none; 
+                border: none; 
+            }
         }
+        
         @media (max-width: 600px) {
-            .report-container { padding: 1.25rem; }
-            .outcome-title { font-size: 1.25rem; }
+            .report-container { 
+                padding: 1.5rem; 
+            }
+            .outcome-title { 
+                font-size: 1.5rem; 
+            }
+            .navbar {
+                padding: 12px 5%;
+            }
+            .nav-links {
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-links {
+                display: none;
+            }
+            .logo-text {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="back-bar" id="backBar"></div>
 
-    <div class="report-container" id="app">
-        <div class="state-card">
-            <h2>Loading report…</h2>
-            <p>Fetching plain-language summary.</p>
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+    <a href="index.html" class="logo">
+        <div class="logo-icon">
+            <i class="fas fa-shield-alt"></i>
         </div>
+        <div>
+            <div class="logo-text">Fair<span>Trust</span></div>
+            <div class="logo-subtitle">ETHICAL AI</div>
+        </div>
+    </a>
+
+    <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="upload.html">Upload</a>
+        <a href="docs.html">Docs</a>
+        <a href="admin.html">Admin</a>
     </div>
+</nav>
 
-    <script>
-        const API_BASE = 'http://127.0.0.1:5000';
+<div class="back-bar" id="backBar"></div>
 
-        function renderNoData(msg) {
-            document.getElementById('app').innerHTML = `
-                <div class="state-card">
-                    <h2>No report found</h2>
-                    <p>${msg || 'Complete an evaluation first.'}</p>
-                    <a href="upload.html" class="btn btn-primary" style="display:inline-flex;margin-top:0.5rem">Start evaluation</a>
-                </div>`;
+<div class="report-container" id="app">
+    <div class="state-card">
+        <i class="fas fa-spinner fa-pulse" style="font-size: 2rem; color: var(--secondary); margin-bottom: 1rem;"></i>
+        <h2>Loading report…</h2>
+        <p>Fetching plain-language summary.</p>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'http://127.0.0.1:5000';
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
         }
+    });
 
-        // ── Section renderers ─────────────────────────────────────────────────
-
-        function renderHeader(summary, score) {
-            const outcomeClass = {
-                FAIR:    'outcome-fair',
-                PARTIAL: 'outcome-partial',
-                CONCERN: 'outcome-concern',
-            }[summary.outcome] || 'outcome-partial';
-
-            return `
-            <header class="report-header">
-                <div class="outcome-title ${outcomeClass}">${summary.icon} ${summary.verdict}</div>
-                <p class="outcome-sub">${summary.sub}</p>
-                <span class="confidence-badge">Plain Language Summary &nbsp;·&nbsp; Score: ${score.toFixed(2)}</span>
-            </header>`;
-        }
-
-        function renderFactors(items) {
-            const rows = items.map(f => `
-                <li class="factor-item">
-                    <div class="factor-icon ${f.icon_style === 'warning' ? 'warning' : ''}">${f.icon}</div>
-                    <div class="factor-details">
-                        <div class="factor-name">${f.name}</div>
-                        <div class="factor-detail">${f.detail}</div>
-                    </div>
-                    <div class="factor-status ${f.status}">${f.status_label}</div>
-                </li>`).join('');
-
-            return `
-            <section class="section-spacer">
-                <h2 class="explanation-title">Model Fairness Checks</h2>
-                <ul class="factor-list">${rows}</ul>
-            </section>`;
-        }
-
-        function renderBiasIndicators(indicators) {
-            const isClean = indicators.length === 1 && indicators[0].title.includes('No Major');
-            const cardClass = isClean ? 'bias-check clean' : 'bias-check';
-            const icon  = isClean ? '✅' : '🔍';
-            const title = isClean ? 'No Major Bias Indicators Found' : 'Bias Indicators Identified';
-
-            const listItems = indicators.map(ind => `
-                <li><strong>${ind.title}:</strong> ${ind.detail}</li>`).join('');
-
-            return `
-            <section class="${cardClass}">
-                <div class="bias-icon">${icon}</div>
-                <div class="bias-title">${title}</div>
-                <ul class="bias-list">${listItems}</ul>
-            </section>`;
-        }
-
-        function renderWhatThisMeans(wtm) {
-            const cards = (wtm.action_cards || []).map(c => `
-                <div class="action-card">
-                    <div class="action-icon">${c.icon}</div>
-                    <h3>${c.title}</h3>
-                    <div class="action-text">${c.text}</div>
-                </div>`).join('');
-
-            return `
-            <div class="action-section">
-                <h2 class="explanation-title">What this means</h2>
-                <p class="action-summary">${wtm.summary}</p>
-                <div class="action-grid">${cards}</div>
+    function renderNoData(msg) {
+        document.getElementById('app').innerHTML = `
+            <div class="state-card">
+                <i class="fas fa-exclamation-circle" style="font-size: 2rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                <h2>No report found</h2>
+                <p>${msg || 'Complete an evaluation first.'}</p>
+                <a href="upload.html" class="btn btn-primary" style="display:inline-flex;margin-top:0.5rem">
+                    <i class="fas fa-play-circle"></i> Start evaluation
+                </a>
             </div>`;
-        }
+    }
 
-        function renderRecommendations(recs) {
-            const rows = recs.map(r => `
-                <li class="factor-item">
-                    <div class="factor-icon">${r.icon}</div>
-                    <div class="factor-details">
-                        <div class="factor-name">${r.title}</div>
-                        <div class="factor-detail">${r.detail}</div>
-                    </div>
-                </li>`).join('');
+    // ── Section renderers ─────────────────────────────────────────────────
 
-            return `
-            <section class="recs-section">
-                <h2 class="explanation-title">Recommended Improvements</h2>
-                <ul class="factor-list">${rows}</ul>
-                <button class="print-btn" onclick="window.print()">🖨️ Print Report</button>
-            </section>`;
-        }
+    function renderHeader(summary, score) {
+        const outcomeClass = {
+            FAIR:    'outcome-fair',
+            PARTIAL: 'outcome-partial',
+            CONCERN: 'outcome-concern',
+        }[summary.outcome] || 'outcome-partial';
 
-        // ── Full render ───────────────────────────────────────────────────────
-        function renderReport(data, evalId) {
-            document.getElementById('app').innerHTML =
-                renderHeader(data.overall_summary, data.ethical_score) +
-                renderFactors(data.factor_items || []) +
-                renderBiasIndicators(data.bias_indicators || []) +
-                renderWhatThisMeans(data.what_this_means || {}) +
-                renderRecommendations(data.recommendations || []);
+        return `
+        <header class="report-header">
+            <div class="outcome-title ${outcomeClass}">${summary.icon} ${summary.verdict}</div>
+            <p class="outcome-sub">${summary.sub}</p>
+            <span class="confidence-badge">
+                <i class="fas fa-star"></i> Plain Language Summary · Score: ${score.toFixed(2)}
+            </span>
+        </header>`;
+    }
 
-            // Back bar
-            const backLink = `index.html`;
-            document.getElementById('backBar').innerHTML =
-                `<a href="${backLink}">← Back to Home</a>`;
-        }
+    function renderFactors(items) {
+        const rows = items.map(f => `
+            <li class="factor-item">
+                <div class="factor-icon ${f.icon_style === 'warning' ? 'warning' : ''}">${f.icon}</div>
+                <div class="factor-details">
+                    <div class="factor-name">${f.name}</div>
+                    <div class="factor-detail">${f.detail}</div>
+                </div>
+                <div class="factor-status ${f.status}">
+                    ${f.status_label === '✓' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>'}
+                </div>
+            </li>`).join('');
 
-        // ── Init ──────────────────────────────────────────────────────────────
-        (async function init() {
-            const evalId = new URLSearchParams(location.search).get('eval_id')
-                        || sessionStorage.getItem('eval_id');
+        return `
+        <section class="section-spacer">
+            <h2 class="explanation-title"><i class="fas fa-clipboard-check" style="margin-right:8px; color: var(--secondary);"></i>Model Fairness Checks</h2>
+            <ul class="factor-list">${rows}</ul>
+        </section>`;
+    }
 
-            if (!evalId) { renderNoData('No evaluation ID found.'); return; }
+    function renderBiasIndicators(indicators) {
+        const isClean = indicators.length === 1 && indicators[0].title.includes('No Major');
+        const cardClass = isClean ? 'bias-check clean' : 'bias-check';
+        const icon  = isClean ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-search"></i>';
+        const title = isClean ? 'No Major Bias Indicators Found' : 'Bias Indicators Identified';
 
-            try {
-                const res  = await fetch(`${API_BASE}/report/enduser/${evalId}`);
-                const data = await res.json();
+        const listItems = indicators.map(ind => `
+            <li><strong>${ind.title}:</strong> ${ind.detail}</li>`).join('');
 
-                if (res.ok && data.status === 'complete') {
-                    renderReport(data, evalId);
-                } else {
-                    throw new Error(data.error || 'not complete');
-                }
-            } catch (_) {
-                // Fallback: build minimal view from page3 cached result
-                const cached = sessionStorage.getItem('eval_result');
-                if (cached) {
-                    const raw      = JSON.parse(cached);
-                    const fairness = raw.fairness || {};
-                    const score    = raw.ethical_score || 0;
+        return `
+        <section class="${cardClass}">
+            <div class="bias-icon">${icon}</div>
+            <div class="bias-title"><i class="fas ${isClean ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${title}</div>
+            <ul class="bias-list">${listItems}</ul>
+        </section>`;
+    }
 
-                    // Minimal client-side shaping
-                    const outcome = score >= 0.80 ? 'FAIR' : score >= 0.65 ? 'PARTIAL' : 'CONCERN';
-                    const icons   = { FAIR: '✅', PARTIAL: '⚠️', CONCERN: '🔴' };
-                    const verdicts = {
-                        FAIR:    'This model is performing fairly.',
-                        PARTIAL: 'This model has some fairness concerns.',
-                        CONCERN: 'This model has significant fairness issues.',
-                    };
+    function renderWhatThisMeans(wtm) {
+        const cards = (wtm.action_cards || []).map(c => `
+            <div class="action-card">
+                <div class="action-icon">${c.icon}</div>
+                <h3>${c.title}</h3>
+                <div class="action-text">${c.text}</div>
+            </div>`).join('');
 
-                    renderReport({
-                        ethical_score:   score,
-                        overall_summary: { verdict: verdicts[outcome], sub: 'See details below.', outcome, icon: icons[outcome] },
-                        factor_items: [
-                            { icon: '📊', icon_style: 'normal', name: 'Individual Fairness', detail: `Score: ${fairness.individualFairness ?? '—'}`, status: (fairness.individualFairness ?? 0) >= 0.8 ? 'approved' : 'rejected', status_label: (fairness.individualFairness ?? 0) >= 0.8 ? '✓' : '!' },
-                            { icon: '👥', icon_style: 'normal', name: 'Group Fairness',      detail: `Score: ${fairness.groupFairness ?? '—'}`,      status: (fairness.groupFairness ?? 0) >= 0.8      ? 'approved' : 'rejected', status_label: (fairness.groupFairness ?? 0) >= 0.8 ? '✓' : '!' },
-                            { icon: '📉', icon_style: 'normal', name: 'Disparate Impact',    detail: `Score: ${fairness.disparateImpact ?? '—'}`,     status: (fairness.disparateImpact ?? 0) >= 0.8    ? 'approved' : 'rejected', status_label: (fairness.disparateImpact ?? 0) >= 0.8 ? '✓' : '!' },
-                        ],
-                        bias_indicators: [{ title: 'Evaluation Complete', detail: `Ethical score: ${score}` }],
-                        what_this_means: { summary: `The model received an ethical score of ${score}.`, action_cards: [] },
-                        recommendations: [{ icon: '✅', title: 'Continue monitoring', detail: 'Re-evaluate as new data is collected.' }],
-                    }, evalId);
-                    return;
-                }
-                renderNoData('Could not load end-user report.');
+        return `
+        <div class="action-section">
+            <h2 class="explanation-title"><i class="fas fa-lightbulb" style="margin-right:8px; color: var(--secondary);"></i>What this means</h2>
+            <p class="action-summary">${wtm.summary}</p>
+            <div class="action-grid">${cards}</div>
+        </div>`;
+    }
+
+    function renderRecommendations(recs) {
+        const rows = recs.map(r => `
+            <li class="factor-item">
+                <div class="factor-icon">${r.icon}</div>
+                <div class="factor-details">
+                    <div class="factor-name">${r.title}</div>
+                    <div class="factor-detail">${r.detail}</div>
+                </div>
+            </li>`).join('');
+
+        return `
+        <section class="recs-section">
+            <h2 class="explanation-title"><i class="fas fa-tasks" style="margin-right:8px; color: var(--secondary);"></i>Recommended Improvements</h2>
+            <ul class="factor-list">${rows}</ul>
+            <button class="print-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Report
+            </button>
+        </section>`;
+    }
+
+    // ── Full render ───────────────────────────────────────────────────────
+    function renderReport(data, evalId) {
+        document.getElementById('app').innerHTML =
+            renderHeader(data.overall_summary, data.ethical_score) +
+            renderFactors(data.factor_items || []) +
+            renderBiasIndicators(data.bias_indicators || []) +
+            renderWhatThisMeans(data.what_this_means || {}) +
+            renderRecommendations(data.recommendations || []);
+
+        // Back bar
+        const backLink = `index.html`;
+        document.getElementById('backBar').innerHTML =
+            `<a href="${backLink}"><i class="fas fa-arrow-left"></i> Back to Home</a>`;
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────
+    (async function init() {
+        const evalId = new URLSearchParams(location.search).get('eval_id')
+                    || sessionStorage.getItem('eval_id');
+
+        if (!evalId) { renderNoData('No evaluation ID found.'); return; }
+
+        try {
+            const res  = await fetch(`${API_BASE}/report/enduser/${evalId}`);
+            const data = await res.json();
+
+            if (res.ok && data.status === 'complete') {
+                renderReport(data, evalId);
+            } else {
+                throw new Error(data.error || 'not complete');
             }
-        })();
-    </script>
+        } catch (_) {
+            // Fallback: build minimal view from page3 cached result
+            const cached = sessionStorage.getItem('eval_result');
+            if (cached) {
+                const raw      = JSON.parse(cached);
+                const fairness = raw.fairness || {};
+                const score    = raw.ethical_score || 0;
+
+                // Minimal client-side shaping
+                const outcome = score >= 0.80 ? 'FAIR' : score >= 0.65 ? 'PARTIAL' : 'CONCERN';
+                const icons   = { FAIR: '✅', PARTIAL: '⚠️', CONCERN: '🔴' };
+                const verdicts = {
+                    FAIR:    'This model is performing fairly.',
+                    PARTIAL: 'This model has some fairness concerns.',
+                    CONCERN: 'This model has significant fairness issues.',
+                };
+
+                renderReport({
+                    ethical_score:   score,
+                    overall_summary: { verdict: verdicts[outcome], sub: 'See details below.', outcome, icon: icons[outcome] },
+                    factor_items: [
+                        { icon: '📊', icon_style: 'normal', name: 'Individual Fairness', detail: `Score: ${(fairness.individualFairness || 0).toFixed(2)}`, status: (fairness.individualFairness ?? 0) >= 0.8 ? 'approved' : 'rejected', status_label: (fairness.individualFairness ?? 0) >= 0.8 ? '✓' : '!' },
+                        { icon: '👥', icon_style: 'normal', name: 'Group Fairness',      detail: `Score: ${(fairness.groupFairness || 0).toFixed(2)}`,      status: (fairness.groupFairness ?? 0) >= 0.8      ? 'approved' : 'rejected', status_label: (fairness.groupFairness ?? 0) >= 0.8 ? '✓' : '!' },
+                        { icon: '📉', icon_style: 'normal', name: 'Disparate Impact',    detail: `Score: ${(fairness.disparateImpact || 0).toFixed(2)}`,     status: (fairness.disparateImpact ?? 0) >= 0.8    ? 'approved' : 'rejected', status_label: (fairness.disparateImpact ?? 0) >= 0.8 ? '✓' : '!' },
+                    ],
+                    bias_indicators: [{ title: 'Evaluation Complete', detail: `Ethical score: ${score}` }],
+                    what_this_means: { summary: `The model received an ethical score of ${score}.`, action_cards: [] },
+                    recommendations: [{ icon: '✅', title: 'Continue monitoring', detail: 'Re-evaluate as new data is collected.' }],
+                }, evalId);
+                return;
+            }
+            renderNoData('Could not load end-user report.');
+        }
+    })();
+</script>
 </body>
 </html>
