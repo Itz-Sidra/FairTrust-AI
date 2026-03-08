@@ -3,412 +3,1414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload - Fairtrust AI Framework</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <title>Upload - FairTrust AI Framework</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --accent: #1A56FF; --accent-dim: #EDF1FF; --accent-hover: #1444DD;
-            --warning: #FFB020; --danger: #FF5C38; --success: #00C896;
-            --success-soft: #E9FBF4; --bg: #F5F6FA; --bg-2: #ECEEF5;
-            --surface: #FFFFFF; --ink: #0D0F14; --ink-2: #1E2433; --ink-3: #3D4560;
-            --muted: #6B7594; --rule: #E4E7F0;
+        *, *::before, *::after { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
         }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; }
-        header { background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--rule); position: sticky; top: 0; z-index: 1000; }
-        nav { max-width: 1160px; margin: 0 auto; padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
-        .logo-mark { display: flex; align-items: center; gap: 0.625rem; text-decoration: none; }
-        .logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.0625rem; color: var(--ink); }
-        .logo-text span { color: var(--accent); }
-        .nav-links { display: flex; align-items: center; gap: 0.25rem; }
-        .nav-links a { text-decoration: none; color: var(--muted); font-size: 0.9rem; font-weight: 500; padding: 0.4rem 0.75rem; border-radius: 6px; transition: color 0.15s, background 0.15s; }
-        .nav-links a:hover { color: var(--ink); background: var(--bg-2); }
-        .nav-links a.active { color: var(--accent); }
-        .breadcrumbs { max-width: 1160px; margin: 0 auto; padding: 0.875rem 2rem; font-size: 0.8125rem; color: var(--muted); display: flex; align-items: center; gap: 0.5rem; }
-        .breadcrumbs a { color: var(--accent); text-decoration: none; font-weight: 500; }
-        .global-error { display: none; max-width: 1160px; margin: 0 auto 1rem; padding: 0 2rem; }
-        .global-error-inner { background: #FFF1EE; border: 1px solid #FFCFC4; border-radius: 10px; padding: 0.875rem 1rem; color: #C0391B; font-size: 0.875rem; display: flex; align-items: flex-start; gap: 0.625rem; }
-        .upload-page { max-width: 1160px; margin: 0 auto; padding: 2rem 2rem 4rem; }
-        .page-header { margin-bottom: 2rem; }
-        .page-header h1 { font-family: 'Syne', sans-serif; font-size: 1.875rem; font-weight: 800; letter-spacing: -0.025em; color: var(--ink); margin-bottom: 0.375rem; }
-        .page-header p { color: var(--muted); font-size: 0.9375rem; }
-        .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
-        .upload-card, .section-block { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 1.5rem; }
-        .card-header { display: flex; align-items: center; gap: 0.625rem; margin-bottom: 1.25rem; }
-        .card-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .card-icon.blue { background: var(--accent-dim); }
-        .card-icon.green { background: var(--success-soft); }
-        .card-icon.amber { background: #FFF8E6; }
-        .card-icon.purple { background: #F5F0FF; }
-        .card-title { font-family: 'Syne', sans-serif; font-size: 0.9375rem; font-weight: 700; color: var(--ink); }
-        .upload-area { border: 2px dashed var(--rule); border-radius: 10px; padding: 2rem 1rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 0.75rem; user-select: none; background: var(--bg); }
-        .upload-area:hover, .upload-area.dragover { border-color: var(--accent); background: var(--accent-dim); }
-        .upload-area.uploaded { border-color: var(--success); background: var(--success-soft); border-style: solid; }
-        .upload-icon { display: flex; justify-content: center; margin-bottom: 0.75rem; }
-        .upload-main-text { font-weight: 600; font-size: 0.9rem; color: var(--ink-2); }
-        .upload-hint { color: var(--muted); font-size: 0.8rem; margin-top: 0.25rem; }
-        .file-limit { color: var(--muted); font-size: 0.75rem; margin-bottom: 0.75rem; }
-        .file-status { display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem; padding: 0.55rem 0.875rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 500; }
-        .file-status.success { display: flex; background: var(--success-soft); color: #059669; border: 1px solid #A7F3D0; }
-        .file-status.error { display: flex; background: #FFF1EE; color: var(--danger); border: 1px solid #FFCFC4; }
-        .file-status.uploading { display: flex; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(26,86,255,0.2); }
-        .upload-spinner { width:14px; height:14px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .field-group { margin-top: 1rem; }
-        .field-group label { display: block; margin-bottom: 0.4rem; font-size: 0.8125rem; font-weight: 600; color: var(--ink-3); }
-        .field-group select, .field-group input[type="text"] { width: 100%; padding: 0.5625rem 0.875rem; border: 1.5px solid var(--rule); border-radius: 8px; background: var(--surface); font-size: 0.875rem; font-family: inherit; color: var(--ink); transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
-        .field-group select:focus, .field-group input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,86,255,0.08); }
-        .field-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
-        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.875rem; margin-top: 1rem; }
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem; padding: 0.5625rem 1rem; border-radius: 8px; font-size: 0.8125rem; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1.5px solid transparent; }
-        .btn-block { width: 100%; }
-        .btn-ghost { background: var(--bg); border-color: var(--rule); color: var(--ink-3); }
-        .btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
-        .btn-primary-filled { background: var(--accent); color: white; border-color: var(--accent); }
-        .btn-primary-filled:hover { background: var(--accent-hover); }
-        .btn-danger-outline { border-color: rgba(255,92,56,0.35); color: var(--danger); background: #FFF1EE; }
-        .btn-danger-outline:hover { background: var(--danger); color: white; border-color: var(--danger); }
-        .checkbox-wrapper { margin-top: 0.875rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--ink-3); }
-        .checkbox-wrapper input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
-        .section-block { margin-bottom: 1.25rem; }
-        .section-block .card-header { margin-bottom: 0.5rem; }
-        .section-desc { font-size: 0.875rem; color: var(--muted); margin-bottom: 1.25rem; }
-        .attribute-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.625rem; margin-bottom: 1rem; }
-        .attribute-checkbox { display: flex; align-items: center; gap: 0.625rem; background: var(--bg); padding: 0.75rem 0.875rem; border-radius: 8px; border: 1.5px solid var(--rule); cursor: pointer; transition: all 0.2s; font-size: 0.875rem; font-weight: 500; color: var(--ink-3); }
-        .attribute-checkbox:hover { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
-        .attribute-checkbox input[type="checkbox"] { display: none; }
-        .checkbox-custom { width: 16px; height: 16px; border: 2px solid var(--rule); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
-        .attribute-checkbox:has(input:checked) { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
-        .attribute-checkbox input[type="checkbox"]:checked + .checkbox-custom { background: var(--accent); border-color: var(--accent); }
-        .attribute-checkbox input[type="checkbox"]:checked + .checkbox-custom::after { content:''; display:block; width:4px; height:7px; border:2px solid white; border-top:none; border-left:none; transform:rotate(45deg) translateY(-1px); }
-        .attr-icon { width: 20px; height: 20px; flex-shrink: 0; }
-        .other-input-wrap { display: none; margin-top: 0.75rem; }
-        .other-input-wrap.visible { display: block; }
-        .selected-attrs-display { display: none; margin-bottom: 1rem; padding: 0.875rem; background: var(--accent-dim); border-radius: 8px; border: 1px solid rgba(26,86,255,0.15); }
-        .attrs-label { font-size: 0.8rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
-        .attr-tag { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.75rem; background: white; border: 1px solid rgba(26,86,255,0.2); border-radius: 999px; font-size: 0.8125rem; font-weight: 500; color: var(--accent); }
-        .warning-banner { background: #FFFBEB; border-left: 3px solid var(--warning); padding: 0.875rem; border-radius: 0 8px 8px 0; margin-top: 0.875rem; font-size: 0.8rem; color: #92400E; display: flex; gap: 0.5rem; align-items: flex-start; }
-        .ranking-list { margin: 0.875rem 0; }
-        .ranking-item { display: grid; grid-template-columns: 30px 155px 1fr 54px 100px; align-items: center; gap: 1rem; padding: 0.875rem 1rem; background: var(--bg); border: 1.5px solid var(--rule); border-radius: 10px; margin-bottom: 0.5rem; cursor: grab; transition: all 0.2s; font-size: 0.875rem; }
-        .ranking-item:hover { background: #F0F3FF; border-color: var(--accent); box-shadow: 0 2px 8px rgba(26,86,255,0.08); }
-        .ranking-item.dragging { opacity: 0.5; background: var(--accent-dim); cursor: grabbing; }
-        .rank-number { width: 28px; height: 28px; background: var(--accent); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; font-family: 'Syne', sans-serif; flex-shrink: 0; }
-        .dimension-name { font-weight: 600; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .weight-bar { height: 6px; background: var(--rule); border-radius: 100px; overflow: hidden; }
-        .weight-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #7B61FF); border-radius: 100px; transition: width 0.25s; }
-        .weight-value { font-weight: 700; color: var(--accent); min-width: 44px; text-align: right; font-size: 0.8125rem; }
-        .weight-slider { width: 100px; height: 4px; border-radius: 100px; background: var(--rule); outline: none; -webkit-appearance: none; appearance: none; cursor: pointer; }
-        .weight-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 0 3px rgba(26,86,255,0.2); }
-        .weight-slider::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; border: none; }
-        .weight-summary { background: var(--bg); padding: 1rem; border-radius: 10px; margin: 1rem 0; border: 1px solid var(--rule); }
-        .weight-summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--ink-2); }
-        .weight-summary-total { color: var(--accent); font-family: 'Syne', sans-serif; font-size: 1rem; }
-        .weight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; }
-        .weight-stat { text-align: center; padding: 0.625rem; background: var(--surface); border-radius: 8px; border: 1px solid var(--rule); }
-        .weight-stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-        .weight-stat-name { font-size: 0.8125rem; font-weight: 700; color: var(--accent); margin-top: 0.15rem; }
-        .weight-stat.low .weight-stat-name { color: var(--danger); }
-        .weight-stat-val { font-size: 0.75rem; color: var(--muted); }
-        .report-toggle { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        .report-card { border: 2px solid var(--rule); border-radius: 12px; padding: 1.5rem; cursor: pointer; transition: all 0.2s; position: relative; background: var(--bg); }
-        .report-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,86,255,0.1); background: var(--surface); }
-        .report-card.selected { border-color: var(--accent); background: var(--accent-dim); }
-        .report-icon { width: 44px; height: 44px; border-radius: 10px; background: var(--surface); border: 1px solid var(--rule); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
-        .report-card.selected .report-icon { background: rgba(26,86,255,0.15); border-color: rgba(26,86,255,0.2); }
-        .report-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--ink); margin-bottom: 0.25rem; }
-        .report-desc { font-size: 0.875rem; color: var(--muted); margin-bottom: 1rem; min-height: 38px; }
-        .report-features { display: flex; flex-wrap: wrap; gap: 0.375rem; }
-        .feature-tag { background: var(--surface); border: 1px solid var(--rule); padding: 0.2rem 0.625rem; border-radius: 100px; font-size: 0.75rem; font-weight: 500; color: var(--ink-3); }
-        .report-card.selected .feature-tag { background: rgba(255,255,255,0.7); border-color: rgba(26,86,255,0.2); }
-        .selection-indicator { position: absolute; top: 0.875rem; right: 0.875rem; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; transform: scale(0); transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
-        .report-card.selected .selection-indicator { transform: scale(1); }
-        .submit-section { margin-top: 2rem; text-align: center; padding-bottom: 3rem; }
-        .submit-btn { width: 100%; max-width: 480px; padding: 1.0625rem; background: var(--accent); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-bottom: 0.875rem; font-family: 'Syne', sans-serif; letter-spacing: 0.02em; box-shadow: 0 4px 20px rgba(26,86,255,0.3); }
-        .submit-btn:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(26,86,255,0.38); }
-        .submit-btn:disabled { background: #B4BAD0; cursor: not-allowed; transform: none; box-shadow: none; }
-        .eta-text { font-size: 0.8125rem; color: var(--muted); }
-        .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.875rem 1.25rem; border-radius: 10px; font-size: 0.875rem; font-weight: 500; display: flex; align-items: center; gap: 0.625rem; box-shadow: 0 8px 32px rgba(13,15,20,0.15); z-index: 9999; transform: translateY(120px); opacity: 0; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); max-width: 380px; }
-        .toast.show { transform: translateY(0); opacity: 1; }
-        .toast.success { background: var(--success-soft); color: #059669; border: 1px solid #A7F3D0; }
-        .toast.error { background: #FFF1EE; color: var(--danger); border: 1px solid #FFCFC4; }
-        .toast.info { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(26,86,255,0.2); }
-        .info-banner { margin-top: 1rem; padding: 0.875rem; background: var(--accent-dim); border-radius: 8px; border: 1px solid rgba(26,86,255,0.15); font-size: 0.8125rem; color: var(--accent); }
+        
+        :root {
+            --primary: #1A2D4E;      /* Deep Navy - dominant */
+            --primary-light: #2A3F66;
+            --primary-soft: #E9ECF3;  /* Soft navy-tinted background */
+            --secondary: #EBB255;     /* Gold/Amber - minimal accents */
+            --accent: #4A90E2;        /* Soft Blue */
+            --warning: #FFB020;
+            --danger: #FF5C38;
+            --success: #00C896;
+            --success-soft: #E9FBF4;
+            --bg: #F5F6FA;
+            --bg-2: #ECEEF5;
+            --surface: #FFFFFF;
+            --ink: #1A2D4E;
+            --ink-2: #1E2433;
+            --ink-3: #3D4560;
+            --muted: #6B7594;
+            --rule: #E4E7F0;
+            --shadow: 0 10px 30px rgba(26, 45, 78, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --radius: 16px;
+        }
+        
+        body { 
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif; 
+            background: var(--bg); 
+            color: var(--ink); 
+            line-height: 1.6; 
+        }
+
+        /* ================= NAVBAR ================= */
+        .navbar {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 16px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(235, 178, 85, 0.15);
+        }
+
+        .navbar.scrolled {
+            padding: 12px 5%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: var(--primary);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #4A90E2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(26, 45, 78, 0.2);
+            transition: var(--transition);
+        }
+
+        .logo:hover .logo-icon {
+            transform: rotate(5deg) scale(1.05);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .logo-text span {
+            color: var(--secondary);
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--secondary);
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            position: relative;
+            padding: 8px 0;
+            transition: var(--transition);
+        }
+
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--secondary);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+
+        .nav-links a.active {
+            color: var(--secondary);
+        }
+
+        .nav-links a.active:after {
+            width: 100%;
+        }
+
+        /* ================= BREADCRUMBS ================= */
+        .breadcrumbs { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0.875rem 5%; 
+            font-size: 0.8125rem; 
+            color: var(--muted); 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+            background: var(--surface); 
+            border-bottom: 1px solid var(--rule); 
+        }
+
+        .breadcrumbs a { 
+            color: var(--secondary); 
+            text-decoration: none; 
+            font-weight: 500; 
+            transition: var(--transition);
+        }
+
+        .breadcrumbs a:hover { 
+            color: var(--primary); 
+        }
+
+        /* ================= GLOBAL ERROR ================= */
+        .global-error { 
+            display: none; 
+            max-width: 1200px; 
+            margin: 0 auto 1rem; 
+            padding: 0 5%; 
+        }
+
+        .global-error-inner { 
+            background: #FFF1EE; 
+            border: 1px solid #FFCFC4; 
+            border-left: 4px solid var(--danger);
+            border-radius: 0 10px 10px 0; 
+            padding: 0.875rem 1rem; 
+            color: #C0391B; 
+            font-size: 0.875rem; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 0.625rem; 
+        }
+
+        .global-error-inner i {
+            color: var(--danger);
+            margin-top: 2px;
+        }
+
+        /* ================= MAIN CONTENT ================= */
+        .upload-page { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 2rem 5% 4rem; 
+        }
+
+        .page-header { 
+            margin-bottom: 2rem; 
+        }
+
+        .page-header h1 { 
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            color: var(--primary);
+            margin-bottom: 0.375rem; 
+            position: relative;
+            display: inline-block;
+        }
+
+        .page-header h1:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        .page-header p { 
+            color: var(--muted); 
+            font-size: 0.9375rem; 
+            margin-top: 1rem;
+        }
+
+        .upload-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 1.5rem; 
+            margin-bottom: 1.5rem; 
+        }
+
+        .upload-card, .section-block { 
+            background: var(--surface); 
+            border: 2px solid rgba(26, 45, 78, 0.08); 
+            border-radius: var(--radius); 
+            padding: 1.75rem; 
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .upload-card:hover, .section-block:hover { 
+            border-color: rgba(26, 45, 78, 0.15); 
+            box-shadow: 0 15px 35px rgba(26, 45, 78, 0.12);
+        }
+
+        .card-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+            margin-bottom: 1.25rem; 
+        }
+
+        .card-icon { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-shrink: 0; 
+            background: rgba(235, 178, 85, 0.1); 
+            color: var(--secondary); 
+            font-size: 18px;
+            transition: var(--transition);
+        }
+
+        .upload-card:hover .card-icon,
+        .section-block:hover .card-icon { 
+            background: var(--secondary); 
+            color: white; 
+            transform: rotate(5deg); 
+        }
+
+        .card-title { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            color: var(--primary);
+        }
+
+        /* Upload Area */
+        .upload-area { 
+            border: 2px dashed rgba(26, 45, 78, 0.2); 
+            border-radius: 12px; 
+            padding: 2rem 1rem; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: var(--transition);
+            margin-bottom: 0.75rem; 
+            user-select: none; 
+            background: var(--bg); 
+        }
+
+        .upload-area:hover, .upload-area.dragover { 
+            border-color: var(--secondary); 
+            background: rgba(235, 178, 85, 0.05); 
+        }
+
+        .upload-area.uploaded { 
+            border-color: var(--success); 
+            background: var(--success-soft); 
+            border-style: solid; 
+        }
+
+        .upload-icon { 
+            display: flex; 
+            justify-content: center; 
+            margin-bottom: 0.75rem; 
+            color: var(--secondary);
+            font-size: 36px;
+        }
+
+        .upload-main-text { 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            color: var(--ink-2); 
+        }
+
+        .upload-hint { 
+            color: var(--muted); 
+            font-size: 0.8rem; 
+            margin-top: 0.25rem; 
+        }
+
+        .file-limit { 
+            color: var(--muted); 
+            font-size: 0.75rem; 
+            margin-bottom: 0.75rem; 
+        }
+
+        .file-status { 
+            display: none; 
+            align-items: center; 
+            gap: 0.5rem; 
+            margin-top: 0.5rem; 
+            padding: 0.55rem 0.875rem; 
+            border-radius: 8px; 
+            font-size: 0.8125rem; 
+            font-weight: 500; 
+        }
+
+        .file-status.success { 
+            display: flex; 
+            background: var(--success-soft); 
+            color: #059669; 
+            border: 1px solid #A7F3D0; 
+        }
+
+        .file-status.error { 
+            display: flex; 
+            background: #FFF1EE; 
+            color: var(--danger); 
+            border: 1px solid #FFCFC4; 
+        }
+
+        .file-status.uploading { 
+            display: flex; 
+            background: rgba(235, 178, 85, 0.1); 
+            color: var(--secondary); 
+            border: 1px solid rgba(235, 178, 85, 0.2); 
+        }
+
+        .upload-spinner { 
+            width: 14px; 
+            height: 14px; 
+            border: 2px solid currentColor; 
+            border-top-color: transparent; 
+            border-radius: 50%; 
+            animation: spin 0.7s linear infinite; 
+            flex-shrink: 0; 
+        }
+
+        @keyframes spin { 
+            to { transform: rotate(360deg); } 
+        }
+
+        /* Form Fields */
+        .field-group { 
+            margin-top: 1rem; 
+        }
+
+        .field-group label { 
+            display: block; 
+            margin-bottom: 0.4rem; 
+            font-size: 0.8125rem; 
+            font-weight: 600; 
+            color: var(--ink-3); 
+        }
+
+        .field-group label .optional {
+            color: var(--muted);
+            font-weight: 400;
+            font-size: 0.75rem;
+            margin-left: 4px;
+        }
+
+        .field-group select, 
+        .field-group input[type="text"] { 
+            width: 100%; 
+            padding: 0.625rem 0.875rem; 
+            border: 2px solid var(--rule); 
+            border-radius: 8px; 
+            background: var(--surface); 
+            font-size: 0.875rem; 
+            font-family: inherit; 
+            color: var(--ink); 
+            transition: var(--transition);
+            outline: none; 
+        }
+
+        .field-group select:focus, 
+        .field-group input[type="text"]:focus { 
+            border-color: var(--secondary); 
+            box-shadow: 0 0 0 3px rgba(235, 178, 85, 0.1); 
+        }
+
+        .field-hint { 
+            font-size: 0.75rem; 
+            color: var(--muted); 
+            margin-top: 0.3rem; 
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .field-hint i {
+            color: var(--secondary);
+            font-size: 0.7rem;
+        }
+
+        .field-row { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 0.875rem; 
+            margin-top: 1rem; 
+        }
+
+        /* Buttons */
+        .btn { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.375rem; 
+            padding: 0.625rem 1rem; 
+            border-radius: 8px; 
+            font-size: 0.8125rem; 
+            font-family: inherit; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: var(--transition);
+            border: 2px solid transparent; 
+        }
+
+        .btn-block { 
+            width: 100%; 
+        }
+
+        .btn-ghost { 
+            background: var(--bg); 
+            border-color: rgba(26, 45, 78, 0.15); 
+            color: var(--ink-3); 
+        }
+
+        .btn-ghost:hover { 
+            border-color: var(--secondary); 
+            color: var(--secondary); 
+            background: rgba(235, 178, 85, 0.05); 
+        }
+
+        .btn-primary-filled { 
+            background: linear-gradient(135deg, var(--primary), #2c3e50); 
+            color: white; 
+            border-color: var(--primary); 
+            box-shadow: 0 4px 15px rgba(26, 45, 78, 0.2);
+        }
+
+        .btn-primary-filled:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 45, 78, 0.3);
+        }
+
+        .btn-danger-outline { 
+            border-color: rgba(255, 92, 56, 0.35); 
+            color: var(--danger); 
+            background: #FFF1EE; 
+        }
+
+        .btn-danger-outline:hover { 
+            background: var(--danger); 
+            color: white; 
+            border-color: var(--danger); 
+        }
+
+        /* Checkbox */
+        .checkbox-wrapper { 
+            margin-top: 0.875rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+            font-size: 0.8125rem; 
+            color: var(--ink-3); 
+        }
+
+        .checkbox-wrapper input[type="checkbox"] { 
+            width: 16px; 
+            height: 16px; 
+            cursor: pointer; 
+            accent-color: var(--secondary); 
+        }
+
+        .section-desc { 
+            font-size: 0.875rem; 
+            color: var(--muted); 
+            margin-bottom: 1.25rem; 
+        }
+
+        /* Attribute Grid */
+        .attribute-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+            gap: 0.75rem; 
+            margin-bottom: 1rem; 
+        }
+
+        .attribute-checkbox { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+            background: var(--bg); 
+            padding: 0.75rem 0.875rem; 
+            border-radius: 8px; 
+            border: 2px solid rgba(26, 45, 78, 0.15); 
+            cursor: pointer; 
+            transition: var(--transition);
+            font-size: 0.875rem; 
+            font-weight: 500; 
+            color: var(--ink-3); 
+        }
+
+        .attribute-checkbox:hover { 
+            border-color: var(--secondary); 
+            background: rgba(235, 178, 85, 0.05); 
+            color: var(--secondary); 
+        }
+
+        .attribute-checkbox:has(input:checked) { 
+            border-color: var(--secondary); 
+            background: rgba(235, 178, 85, 0.1); 
+            color: var(--secondary); 
+        }
+
+        .attribute-checkbox input[type="checkbox"] { 
+            display: none; 
+        }
+
+        .checkbox-custom { 
+            width: 16px; 
+            height: 16px; 
+            border: 2px solid rgba(26, 45, 78, 0.3); 
+            border-radius: 4px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: var(--transition);
+            flex-shrink: 0; 
+        }
+
+        .attribute-checkbox input[type="checkbox"]:checked + .checkbox-custom { 
+            background: var(--secondary); 
+            border-color: var(--secondary); 
+        }
+
+        .attribute-checkbox input[type="checkbox"]:checked + .checkbox-custom::after { 
+            content: ''; 
+            display: block; 
+            width: 4px; 
+            height: 7px; 
+            border: 2px solid white; 
+            border-top: none; 
+            border-left: none; 
+            transform: rotate(45deg) translateY(-1px); 
+        }
+
+        .attr-icon { 
+            width: 18px; 
+            height: 18px; 
+            color: currentColor; 
+            flex-shrink: 0; 
+        }
+
+        .other-input-wrap { 
+            display: none; 
+            margin-top: 0.75rem; 
+        }
+
+        .other-input-wrap.visible { 
+            display: block; 
+        }
+
+        .selected-attrs-display { 
+            display: none; 
+            margin-bottom: 1rem; 
+            padding: 1rem; 
+            background: rgba(235, 178, 85, 0.1); 
+            border-radius: 8px; 
+            border: 1px solid rgba(235, 178, 85, 0.2); 
+        }
+
+        .attrs-label { 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            color: var(--secondary); 
+            text-transform: uppercase; 
+            letter-spacing: 0.06em; 
+            margin-bottom: 0.5rem; 
+        }
+
+        .attr-tag { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.3rem; 
+            padding: 0.25rem 0.75rem; 
+            background: white; 
+            border: 1px solid rgba(235, 178, 85, 0.3); 
+            border-radius: 999px; 
+            font-size: 0.8125rem; 
+            font-weight: 500; 
+            color: var(--primary); 
+        }
+
+        .attr-tag i {
+            color: var(--secondary);
+            font-size: 0.7rem;
+        }
+
+        .warning-banner { 
+            background: #FFFBEB; 
+            border-left: 4px solid var(--warning); 
+            padding: 0.875rem; 
+            border-radius: 0 8px 8px 0; 
+            margin-top: 0.875rem; 
+            font-size: 0.8rem; 
+            color: #92400E; 
+            display: flex; 
+            gap: 0.5rem; 
+            align-items: flex-start; 
+        }
+
+        .warning-banner i {
+            color: var(--warning);
+            margin-top: 2px;
+        }
+
+        .info-banner { 
+            margin-top: 1rem; 
+            padding: 0.875rem; 
+            background: rgba(235, 178, 85, 0.1); 
+            border-radius: 8px; 
+            border: 1px solid rgba(235, 178, 85, 0.2); 
+            font-size: 0.8125rem; 
+            color: var(--primary); 
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-banner i {
+            color: var(--secondary);
+        }
+
+        /* Ranking List */
+        .ranking-list { 
+            margin: 0.875rem 0; 
+        }
+
+        .ranking-item { 
+            display: grid; 
+            grid-template-columns: 40px 1fr 1fr 60px 120px; 
+            align-items: center; 
+            gap: 1rem; 
+            padding: 0.875rem 1rem; 
+            background: var(--bg); 
+            border: 2px solid rgba(26, 45, 78, 0.15); 
+            border-radius: 10px; 
+            margin-bottom: 0.5rem; 
+            cursor: grab; 
+            transition: var(--transition);
+            font-size: 0.875rem; 
+        }
+
+        .ranking-item:hover { 
+            background: rgba(235, 178, 85, 0.05); 
+            border-color: var(--secondary); 
+            box-shadow: 0 2px 8px rgba(26, 45, 78, 0.08); 
+        }
+
+        .ranking-item.dragging { 
+            opacity: 0.5; 
+            background: rgba(235, 178, 85, 0.1); 
+            cursor: grabbing; 
+        }
+
+        .rank-number { 
+            width: 32px; 
+            height: 32px; 
+            background: linear-gradient(135deg, var(--primary), #2c3e50); 
+            color: white; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 700; 
+            font-size: 0.875rem; 
+            flex-shrink: 0; 
+        }
+
+        .dimension-name { 
+            font-weight: 600; 
+            color: var(--ink-2); 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+
+        .weight-bar { 
+            height: 6px; 
+            background: var(--rule); 
+            border-radius: 100px; 
+            overflow: hidden; 
+        }
+
+        .weight-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, var(--secondary), #ffce6d); 
+            border-radius: 100px; 
+            transition: width 0.25s; 
+        }
+
+        .weight-value { 
+            font-weight: 700; 
+            color: var(--secondary); 
+            min-width: 44px; 
+            text-align: right; 
+            font-size: 0.8125rem; 
+        }
+
+        .weight-slider { 
+            width: 100%; 
+            height: 4px; 
+            border-radius: 100px; 
+            background: var(--rule); 
+            outline: none; 
+            -webkit-appearance: none; 
+            appearance: none; 
+            cursor: pointer; 
+        }
+
+        .weight-slider::-webkit-slider-thumb { 
+            -webkit-appearance: none; 
+            width: 16px; 
+            height: 16px; 
+            border-radius: 50%; 
+            background: var(--secondary); 
+            cursor: pointer; 
+            box-shadow: 0 0 0 3px rgba(235, 178, 85, 0.2); 
+            transition: var(--transition);
+        }
+
+        .weight-slider::-webkit-slider-thumb:hover { 
+            transform: scale(1.2); 
+        }
+
+        .weight-summary { 
+            background: var(--bg); 
+            padding: 1rem; 
+            border-radius: 10px; 
+            margin: 1rem 0; 
+            border: 1px solid rgba(26, 45, 78, 0.15); 
+        }
+
+        .weight-summary-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 0.75rem; 
+            font-size: 0.875rem; 
+            font-weight: 600; 
+            color: var(--ink-2); 
+        }
+
+        .weight-summary-total { 
+            color: var(--secondary); 
+            font-size: 1rem; 
+            font-weight: 700; 
+        }
+
+        .weight-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 0.625rem; 
+        }
+
+        .weight-stat { 
+            text-align: center; 
+            padding: 0.625rem; 
+            background: var(--surface); 
+            border-radius: 8px; 
+            border: 1px solid rgba(26, 45, 78, 0.15); 
+        }
+
+        .weight-stat-label { 
+            font-size: 0.7rem; 
+            color: var(--muted); 
+            text-transform: uppercase; 
+            letter-spacing: 0.06em; 
+        }
+
+        .weight-stat-name { 
+            font-size: 0.8125rem; 
+            font-weight: 700; 
+            color: var(--secondary); 
+            margin-top: 0.15rem; 
+        }
+
+        .weight-stat.low .weight-stat-name { 
+            color: var(--danger); 
+        }
+
+        .weight-stat-val { 
+            font-size: 0.75rem; 
+            color: var(--muted); 
+        }
+
+        /* Report Toggle */
+        .report-toggle { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 1rem; 
+        }
+
+        .report-card { 
+            border: 2px solid rgba(26, 45, 78, 0.15); 
+            border-radius: 12px; 
+            padding: 1.5rem; 
+            cursor: pointer; 
+            transition: var(--transition);
+            position: relative; 
+            background: var(--bg); 
+        }
+
+        .report-card:hover { 
+            border-color: var(--secondary); 
+            transform: translateY(-4px); 
+            box-shadow: 0 10px 25px rgba(26, 45, 78, 0.1); 
+            background: var(--surface); 
+        }
+
+        .report-card.selected { 
+            border-color: var(--secondary); 
+            background: rgba(235, 178, 85, 0.05); 
+        }
+
+        .report-icon { 
+            width: 44px; 
+            height: 44px; 
+            border-radius: 10px; 
+            background: var(--surface); 
+            border: 1px solid rgba(26, 45, 78, 0.15); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 1rem; 
+            color: var(--secondary); 
+            font-size: 22px; 
+        }
+
+        .report-card.selected .report-icon { 
+            background: rgba(235, 178, 85, 0.15); 
+            border-color: rgba(235, 178, 85, 0.3); 
+        }
+
+        .report-title { 
+            font-size: 1rem; 
+            font-weight: 700; 
+            color: var(--primary); 
+            margin-bottom: 0.25rem; 
+        }
+
+        .report-desc { 
+            font-size: 0.875rem; 
+            color: var(--muted); 
+            margin-bottom: 1rem; 
+            min-height: 38px; 
+        }
+
+        .report-features { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 0.375rem; 
+        }
+
+        .feature-tag { 
+            background: var(--surface); 
+            border: 1px solid rgba(26, 45, 78, 0.15); 
+            padding: 0.2rem 0.625rem; 
+            border-radius: 100px; 
+            font-size: 0.7rem; 
+            font-weight: 500; 
+            color: var(--ink-3); 
+        }
+
+        .report-card.selected .feature-tag { 
+            background: rgba(255, 255, 255, 0.7); 
+            border-color: rgba(235, 178, 85, 0.3); 
+        }
+
+        .selection-indicator { 
+            position: absolute; 
+            top: 0.875rem; 
+            right: 0.875rem; 
+            width: 22px; 
+            height: 22px; 
+            border-radius: 50%; 
+            background: var(--secondary); 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transform: scale(0); 
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+
+        .report-card.selected .selection-indicator { 
+            transform: scale(1); 
+        }
+
+        .selection-indicator i {
+            font-size: 0.7rem;
+        }
+
+        #selectedReportDisplay { 
+            display: none; 
+            margin-top: 1rem; 
+            padding: 1rem 1.125rem; 
+            background: rgba(235, 178, 85, 0.1); 
+            border-left: 4px solid var(--secondary); 
+            border-radius: 0 8px 8px 0; 
+        }
+
+        #selectedReportName { 
+            font-size: 0.9375rem; 
+            font-weight: 600; 
+            color: var(--primary); 
+        }
+
+        #allReportsWarning { 
+            display: none; 
+            margin-top: 0.875rem; 
+            padding: 0.875rem; 
+            background: #FFFBEB; 
+            border-left: 4px solid var(--warning); 
+            border-radius: 0 8px 8px 0; 
+            font-size: 0.875rem; 
+            color: #92400E; 
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #allReportsWarning i {
+            color: var(--warning);
+        }
+
+        /* Submit Section */
+        .submit-section { 
+            margin-top: 2.5rem; 
+            text-align: center; 
+            padding-bottom: 1rem; 
+        }
+
+        .submit-btn { 
+            width: 100%; 
+            max-width: 480px; 
+            padding: 1.125rem; 
+            background: linear-gradient(135deg, var(--primary), #2c3e50); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: var(--transition);
+            margin-bottom: 0.875rem; 
+            letter-spacing: 0.5px; 
+            box-shadow: 0 4px 20px rgba(26, 45, 78, 0.3); 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:hover:not(:disabled) { 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 28px rgba(26, 45, 78, 0.4); 
+        }
+
+        .submit-btn:disabled { 
+            background: #B4BAD0; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+        }
+
+        .submit-btn i {
+            font-size: 1rem;
+        }
+
+        .eta-text { 
+            font-size: 0.8125rem; 
+            color: var(--muted); 
+        }
+
+        /* Toast */
+        .toast { 
+            position: fixed; 
+            bottom: 1.5rem; 
+            right: 1.5rem; 
+            padding: 0.875rem 1.25rem; 
+            border-radius: 10px; 
+            font-size: 0.875rem; 
+            font-weight: 500; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.625rem; 
+            box-shadow: 0 8px 32px rgba(13, 15, 20, 0.15); 
+            z-index: 9999; 
+            transform: translateY(120px); 
+            opacity: 0; 
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            max-width: 380px; 
+        }
+
+        .toast.show { 
+            transform: translateY(0); 
+            opacity: 1; 
+        }
+
+        .toast.success { 
+            background: var(--success-soft); 
+            color: #059669; 
+            border: 1px solid #A7F3D0; 
+        }
+
+        .toast.error { 
+            background: #FFF1EE; 
+            color: var(--danger); 
+            border: 1px solid #FFCFC4; 
+        }
+
+        .toast.info { 
+            background: rgba(235, 178, 85, 0.1); 
+            color: var(--primary); 
+            border: 1px solid rgba(235, 178, 85, 0.2); 
+        }
+
+        .toast i {
+            font-size: 1rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .upload-card, .section-block {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .upload-grid { grid-template-columns: 1fr; }
-            .ranking-item { grid-template-columns: 28px 1fr 44px; }
-            .ranking-item .weight-bar, .ranking-item .weight-slider { display: none; }
-            nav { padding: 0 1rem; }
-            .upload-page { padding: 1.5rem 1rem 3rem; }
+            .upload-grid { 
+                grid-template-columns: 1fr; 
+            }
+            
+            .ranking-item { 
+                grid-template-columns: 40px 1fr 60px; 
+            }
+            
+            .ranking-item .weight-bar, 
+            .ranking-item .weight-slider { 
+                display: none; 
+            }
+            
+            .navbar { 
+                padding: 16px 4%; 
+            }
+            
+            .nav-links { 
+                gap: 15px; 
+            }
+            
+            .upload-page { 
+                padding: 1.5rem 4% 3rem; 
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-links { 
+                display: none; 
+            }
+            
+            .logo-text { 
+                font-size: 20px; 
+            }
         }
     </style>
 </head>
 <body>
 
-<header>
-  <nav>
-    <a href="index.html" class="logo-mark">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#1A56FF"/><path d="M16 6L7 11V17C7 21.97 10.93 26.6 16 28C21.07 26.6 25 21.97 25 17V11L16 6Z" fill="white" fill-opacity="0.2"/><path d="M13 16L15.5 18.5L20 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="logo-text">Fair<span>Trust</span></span>
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+    <a href="index.html" class="logo">
+        <div class="logo-icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <div>
+            <div class="logo-text">Fair<span>Trust</span></div>
+            <div class="logo-subtitle">ETHICAL AI</div>
+        </div>
     </a>
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="upload.html" class="active">Upload</a>
-      <a href="docs.html">Docs</a>
-      <a href="admin.html">Admin</a>
+
+    <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="upload.html" class="active">Upload</a>
+        <a href="docs.html">Docs</a>
+        <a href="admin.html">Admin</a>
     </div>
-  </nav>
-</header>
+</nav>
 
 <div class="breadcrumbs">
-  <a href="index.html">Home</a>
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-  Upload Dataset
+    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+    <i class="fas fa-chevron-right"></i>
+    <span>Upload Dataset</span>
 </div>
 
 <div class="global-error" id="globalError">
-  <div class="global-error-inner">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    <span id="globalErrorMsg"></span>
-  </div>
+    <div class="global-error-inner">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="globalErrorMsg"></span>
+    </div>
 </div>
 
 <main class="upload-page">
-  <div class="page-header">
-    <h1>Upload your model</h1>
-    <p>Evaluate fairness &amp; bias across seven dimensions</p>
-  </div>
+    <div class="page-header">
+        <h1>Upload your model</h1>
+        <p>Evaluate fairness & bias across seven dimensions</p>
+    </div>
 
-  <div class="upload-grid">
+    <div class="upload-grid">
 
-    <!-- Dataset Card -->
-    <div class="upload-card">
-      <div class="card-header">
-        <div class="card-icon blue">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1A56FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <!-- Dataset Card -->
+        <div class="upload-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <span class="card-title">Upload Dataset</span>
+            </div>
+
+            <div class="upload-area" id="datasetDropZone" role="button" tabindex="0" aria-label="Click or drag to upload dataset">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-main-text" id="datasetUploadText">Drag & drop or click to upload</div>
+                <div class="upload-hint">CSV, JSON, or Excel — must include feature & target columns</div>
+            </div>
+            <div class="file-limit">Max file size: 100MB</div>
+
+            <input type="file" id="datasetFileInput" accept=".csv,.json,.xlsx,.xls"
+                   style="position:fixed;top:-200px;left:-200px;width:1px;height:1px;opacity:0;pointer-events:none;">
+
+            <div class="file-status" id="datasetStatus">
+                <span id="datasetStatusIcon"></span>
+                <span id="datasetStatusText"></span>
+            </div>
+
+            <!-- Target variable -->
+            <div class="field-group">
+                <label for="targetVariableText">Target Variable <span style="color:var(--danger)">*</span></label>
+                <input type="text" id="targetVariableText" placeholder="e.g. approved, outcome, label">
+                <div class="field-hint">
+                    <i class="fas fa-info-circle"></i>
+                    The ground-truth label column in your dataset.
+                </div>
+            </div>
+            <div class="field-group" id="targetDropdownSection" style="display:none;">
+                <label for="targetVariableSelect">Or select from detected columns</label>
+                <select id="targetVariableSelect" onchange="onTargetSelect()">
+                    <option value="">— select a column —</option>
+                </select>
+            </div>
         </div>
-        <span class="card-title">Upload Dataset</span>
-      </div>
 
-      <div class="upload-area" id="datasetDropZone" role="button" tabindex="0" aria-label="Click or drag to upload dataset">
-        <div class="upload-icon">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#9AA3BE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        <!-- Model Config Card -->
+        <div class="upload-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span class="card-title">Model Configuration</span>
+            </div>
+
+            <!-- Prediction variable - now optional -->
+            <div class="field-group" style="margin-top:0;">
+                <label for="predictionVariableText">Prediction Variable <span class="optional">(optional)</span></label>
+                <input type="text" id="predictionVariableText" placeholder="e.g. prediction_score, score, pred">
+                <div class="field-hint">
+                    <i class="fas fa-info-circle"></i>
+                    Leave blank — predictions are generated automatically by the AI model. Or specify a column name to override.
+                </div>
+            </div>
+            <div class="field-group" id="predictionDropdownSection" style="display:none;">
+                <label for="predictionVariableSelect">Or select from detected columns</label>
+                <select id="predictionVariableSelect" onchange="onPredictionSelect()">
+                    <option value="">— select a column —</option>
+                </select>
+            </div>
+
+            <!-- Model name + version -->
+            <div class="field-row">
+                <div class="field-group">
+                    <label for="modelName">Model Name</label>
+                    <input type="text" id="modelName" placeholder="e.g. LoanApprovalV2" value="My Model">
+                </div>
+                <div class="field-group">
+                    <label for="modelVersion">Version</label>
+                    <input type="text" id="modelVersion" placeholder="e.g. 1.0.0" value="1.0.0">
+                </div>
+            </div>
+
+            <div class="checkbox-wrapper" style="margin-top:1rem;">
+                <input type="checkbox" id="useSampleData" onchange="toggleSampleData()">
+                <label for="useSampleData" style="cursor:pointer;">Use sample data (for testing)</label>
+            </div>
+
+            <div id="columnInfoBanner" class="info-banner" style="display:none;">
+                <i class="fas fa-lightbulb"></i>
+                <strong>Tip:</strong> Upload a dataset first, then use the dropdowns to pick your target and prediction columns.
+            </div>
         </div>
-        <div class="upload-main-text" id="datasetUploadText">Drag &amp; drop or click to upload</div>
-        <div class="upload-hint">CSV, JSON, or Excel — must include feature, target &amp; prediction columns</div>
-      </div>
-      <div class="file-limit">Max file size: 100MB</div>
 
-      <input type="file" id="datasetFileInput" accept=".csv,.json,.xlsx,.xls"
-             style="position:fixed;top:-200px;left:-200px;width:1px;height:1px;opacity:0;pointer-events:none;">
+    </div><!-- /upload-grid -->
 
-      <div class="file-status" id="datasetStatus">
-        <span id="datasetStatusIcon"></span>
-        <span id="datasetStatusText"></span>
-      </div>
-
-      <!-- Target variable -->
-      <div class="field-group">
-        <label for="targetVariableText">Target Variable <span style="color:var(--danger)">*</span></label>
-        <input type="text" id="targetVariableText" placeholder="e.g. approved, outcome, label">
-        <div class="field-hint">The ground-truth label column in your dataset.</div>
-      </div>
-      <div class="field-group" id="targetDropdownSection" style="display:none;">
-        <label for="targetVariableSelect">Or select from detected columns</label>
-        <select id="targetVariableSelect" onchange="onTargetSelect()">
-          <option value="">&#8212; select a column &#8212;</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Model Config Card -->
-    <div class="upload-card">
-      <div class="card-header">
-        <div class="card-icon green">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00A87A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <!-- Sensitive Attributes -->
+    <section class="section-block">
+        <div class="card-header">
+            <div class="card-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <span class="card-title">Select Sensitive Attributes</span>
         </div>
-        <span class="card-title">Model Configuration</span>
-      </div>
+        <p class="section-desc">Select the attributes to test for bias in your model's predictions.</p>
 
-      <!-- Prediction variable -->
-      <div class="field-group" style="margin-top:0;">
-        <label for="predictionVariableText">Prediction Variable <span style="color:var(--muted)">(optional)</span></label>
-        <div class="field-hint">Leave blank — predictions are generated automatically by the AI model. Or specify a column name to override.</div>
-      </div>
-      <div class="field-group" id="predictionDropdownSection" style="display:none;">
-        <label for="predictionVariableSelect">Or select from detected columns</label>
-        <select id="predictionVariableSelect" onchange="onPredictionSelect()">
-          <option value="">&#8212; select a column &#8212;</option>
-        </select>
-      </div>
-
-      <!-- Model name + version -->
-      <div class="field-row">
-        <div class="field-group">
-          <label for="modelName">Model Name</label>
-          <input type="text" id="modelName" placeholder="e.g. LoanApprovalV2" value="My Model">
+        <div class="attribute-grid">
+            <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="gender" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><i class="fas fa-venus-mars attr-icon"></i>Gender</label>
+            <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="race" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><i class="fas fa-globe attr-icon"></i>Race / Ethnicity</label>
+            <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="age" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><i class="fas fa-calendar-alt attr-icon"></i>Age</label>
+            <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="socioeconomic" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><i class="fas fa-chart-pie attr-icon"></i>Socioeconomic</label>
+            <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="disability" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><i class="fas fa-wheelchair attr-icon"></i>Disability</label>
+            <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="religion" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><i class="fas fa-church attr-icon"></i>Religion</label>
+            <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="caste" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><i class="fas fa-users attr-icon"></i>Caste</label>
+            <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="marital" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><i class="fas fa-heart attr-icon"></i>Marital Status</label>
+            <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="__other__" id="attrOtherCb" onchange="toggleOtherAttr()"><span class="checkbox-custom"></span><i class="fas fa-ellipsis-h attr-icon"></i>Other…</label>
         </div>
-        <div class="field-group">
-          <label for="modelVersion">Version</label>
-          <input type="text" id="modelVersion" placeholder="e.g. 1.0.0" value="1.0.0">
+
+        <div class="other-input-wrap" id="otherAttrWrap">
+            <div class="field-group" style="margin-top:0;">
+                <label for="otherAttrInput">Custom attribute(s)</label>
+                <input type="text" id="otherAttrInput" placeholder="e.g. nationality, zipcode, language  (comma-separated)" oninput="updateAttrDisplay()">
+                <div class="field-hint">Separate multiple values with commas.</div>
+            </div>
         </div>
-      </div>
 
-      <div class="checkbox-wrapper" style="margin-top:1rem;">
-        <input type="checkbox" id="useSampleData" onchange="toggleSampleData()">
-        <label for="useSampleData" style="cursor:pointer;">Use sample data (for testing)</label>
-      </div>
+        <div class="selected-attrs-display" id="selectedAttrsDisplay">
+            <div class="attrs-label"><i class="fas fa-tags"></i> Selected attributes</div>
+            <div id="attributeTags" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.375rem;"></div>
+        </div>
 
-      <div id="columnInfoBanner" class="info-banner" style="display:none;">
-        <strong>Tip:</strong> Upload a dataset first, then use the dropdowns to pick your target and prediction columns.
-      </div>
+        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;">
+            <button class="btn btn-primary-filled btn-block" type="button" onclick="autoDetect()" style="flex:1;">
+                <i class="fas fa-search"></i> Auto-detect from dataset
+            </button>
+            <button class="btn btn-danger-outline btn-block" type="button" onclick="resetAttrs()" style="flex:1;">
+                <i class="fas fa-times"></i> Clear All
+            </button>
+        </div>
+
+        <div class="warning-banner" id="proxyWarning" style="display:none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span><strong>Proxy variables may be present.</strong> Some attributes can correlate with others — review before submitting.</span>
+        </div>
+    </section>
+
+    <!-- Fairness Priorities -->
+    <section class="section-block">
+        <div class="card-header">
+            <div class="card-icon">
+                <i class="fas fa-balance-scale"></i>
+            </div>
+            <span class="card-title">Rank Fairness Dimensions</span>
+        </div>
+        <p class="section-desc">Drag to reorder · Adjust sliders to set weights (min 5%)</p>
+
+        <div class="ranking-list" id="rankingList">
+            <div class="ranking-item" draggable="true" data-value="individualFairness"><span class="rank-number">1</span><span class="dimension-name">Individual Fairness</span><div class="weight-bar"><div class="weight-fill" style="width:25%"></div></div><span class="weight-value">25%</span><input type="range" class="weight-slider" min="5" max="100" value="25" oninput="updateWeights()"></div>
+            <div class="ranking-item" draggable="true" data-value="groupFairness"><span class="rank-number">2</span><span class="dimension-name">Group Fairness</span><div class="weight-bar"><div class="weight-fill" style="width:20%"></div></div><span class="weight-value">20%</span><input type="range" class="weight-slider" min="5" max="100" value="20" oninput="updateWeights()"></div>
+            <div class="ranking-item" draggable="true" data-value="demographicParity"><span class="rank-number">3</span><span class="dimension-name">Demographic Parity</span><div class="weight-bar"><div class="weight-fill" style="width:15%"></div></div><span class="weight-value">15%</span><input type="range" class="weight-slider" min="5" max="100" value="15" oninput="updateWeights()"></div>
+            <div class="ranking-item" draggable="true" data-value="calibrationError"><span class="rank-number">4</span><span class="dimension-name">Calibration</span><div class="weight-bar"><div class="weight-fill" style="width:12%"></div></div><span class="weight-value">12%</span><input type="range" class="weight-slider" min="5" max="100" value="12" oninput="updateWeights()"></div>
+            <div class="ranking-item" draggable="true" data-value="disparateImpact"><span class="rank-number">5</span><span class="dimension-name">Disparate Impact</span><div class="weight-bar"><div class="weight-fill" style="width:10%"></div></div><span class="weight-value">10%</span><input type="range" class="weight-slider" min="5" max="100" value="10" oninput="updateWeights()"></div>
+            <div class="ranking-item" draggable="true" data-value="counterfactual"><span class="rank-number">6</span><span class="dimension-name">Counterfactual</span><div class="weight-bar"><div class="weight-fill" style="width:10%"></div></div><span class="weight-value">10%</span><input type="range" class="weight-slider" min="5" max="100" value="10" oninput="updateWeights()"></div>
+            <div class="ranking-item" draggable="true" data-value="intersectional"><span class="rank-number">7</span><span class="dimension-name">Intersectional</span><div class="weight-bar"><div class="weight-fill" style="width:8%"></div></div><span class="weight-value">8%</span><input type="range" class="weight-slider" min="5" max="100" value="8" oninput="updateWeights()"></div>
+        </div>
+
+        <div class="weight-summary">
+            <div class="weight-summary-header"><span>Total Weight:</span><span class="weight-summary-total" id="totalWeight">100%</span></div>
+            <div class="weight-grid">
+                <div class="weight-stat"><div class="weight-stat-label">Highest</div><div class="weight-stat-name" id="highestDim">Individual Fairness</div><div class="weight-stat-val" id="highestVal">25%</div></div>
+                <div class="weight-stat low"><div class="weight-stat-label">Lowest</div><div class="weight-stat-name" id="lowestDim">Intersectional</div><div class="weight-stat-val" id="lowestVal">8%</div></div>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;">
+            <button class="btn btn-danger-outline" type="button" onclick="resetRanking()" style="flex:1;"><i class="fas fa-redo-alt"></i> Reset to Default</button>
+            <button class="btn btn-primary-filled" type="button" onclick="normalizeWeights()" style="flex:1;"><i class="fas fa-bolt"></i> Normalize Weights</button>
+        </div>
+        <div style="margin-top:0.875rem;font-size:0.8125rem;color:var(--muted);display:flex;align-items:center;gap:0.375rem;">
+            <i class="fas fa-info-circle"></i>
+            Each dimension gets at least 5%. Click Normalize to distribute proportionally.
+        </div>
+    </section>
+
+    <!-- Report Type -->
+    <section class="section-block">
+        <div class="card-header">
+            <div class="card-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <span class="card-title">Report Type</span>
+        </div>
+        <p class="section-desc">Choose the format for your fairness report</p>
+
+        <div class="report-toggle">
+            <div class="report-card" id="reportDev" onclick="selectReport('developer')">
+                <div class="report-icon"><i class="fas fa-code"></i></div>
+                <h3 class="report-title">Developer</h3><p class="report-desc">Technical metrics & detailed analysis</p>
+                <div class="report-features"><span class="feature-tag">ML Metrics</span><span class="feature-tag">SHAP Analysis</span><span class="feature-tag">JSON Output</span></div>
+                <div class="selection-indicator"><i class="fas fa-check"></i></div>
+            </div>
+            <div class="report-card" id="reportReg" onclick="selectReport('regulator')">
+                <div class="report-icon"><i class="fas fa-gavel"></i></div>
+                <h3 class="report-title">Regulator</h3><p class="report-desc">Compliance & audit documentation</p>
+                <div class="report-features"><span class="feature-tag">Legal Docs</span><span class="feature-tag">Compliance</span><span class="feature-tag">Evidence</span></div>
+                <div class="selection-indicator"><i class="fas fa-check"></i></div>
+            </div>
+            <div class="report-card" id="reportUser" onclick="selectReport('enduser')">
+                <div class="report-icon"><i class="fas fa-users"></i></div>
+                <h3 class="report-title">End-user</h3><p class="report-desc">Plain language explanations</p>
+                <div class="report-features"><span class="feature-tag">Simple Text</span><span class="feature-tag">FAQ</span><span class="feature-tag">Visual</span></div>
+                <div class="selection-indicator"><i class="fas fa-check"></i></div>
+            </div>
+        </div>
+
+        <div id="selectedReportDisplay">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--secondary);margin-bottom:0.2rem;">Selected</div>
+            <div id="selectedReportName" style="font-size:0.9375rem;font-weight:600;color:var(--primary);"></div>
+        </div>
+
+        <div class="checkbox-wrapper" style="margin-top:1.5rem;">
+            <input type="checkbox" id="generateAllReports" onchange="toggleGenerateAll()">
+            <label for="generateAllReports" style="cursor:pointer;"><strong>Generate all report types</strong> — gives you all 3 formats (~5–7 min)</label>
+        </div>
+
+        <div id="allReportsWarning">
+            <i class="fas fa-clock"></i>
+            Generating all reports takes approximately 5–7 minutes.
+        </div>
+    </section>
+
+    <!-- Submit -->
+    <div class="submit-section">
+        <button class="submit-btn" id="submitBtn" type="button" onclick="analyzeFairness()" disabled>
+            <i class="fas fa-play-circle"></i> ANALYZE FAIRNESS →
+        </button>
+        <p class="eta-text" id="etaText">Upload a dataset file to continue</p>
     </div>
-
-  </div><!-- /upload-grid -->
-
-  <!-- Sensitive Attributes -->
-  <section class="section-block">
-    <div class="card-header">
-      <div class="card-icon blue">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1A56FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      </div>
-      <span class="card-title">Select Sensitive Attributes</span>
-    </div>
-    <p class="section-desc">Select the attributes to test for bias in your model's predictions.</p>
-
-    <div class="attribute-grid">
-      <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="gender" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><svg class="attr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a8.38 8.38 0 0 1 13 0"/></svg>Gender</label>
-      <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="race" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><svg class="attr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Race / Ethnicity</label>
-      <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="age" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><svg class="attr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Age</label>
-      <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="socioeconomic" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><svg class="attr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Socioeconomic</label>
-      <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="disability" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><svg class="attr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M8 21l2-8 2 2 2-4 2 10"/><path d="M6 15a6 6 0 0 0 12 0"/></svg>Disability</label>
-      <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="religion" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><svg class="attr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Religion</label>
-      <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="caste" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><svg class="attr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Caste</label>
-      <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="marital" onchange="updateAttrDisplay()"><span class="checkbox-custom"></span><svg class="attr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Marital Status</label>
-      <label class="attribute-checkbox"><input type="checkbox" name="sensitive-attr" value="__other__" id="attrOtherCb" onchange="toggleOtherAttr()"><span class="checkbox-custom"></span><svg class="attr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>Other&#x2026;</label>
-    </div>
-
-    <div class="other-input-wrap" id="otherAttrWrap">
-      <div class="field-group" style="margin-top:0;">
-        <label for="otherAttrInput">Custom attribute(s)</label>
-        <input type="text" id="otherAttrInput" placeholder="e.g. nationality, zipcode, language  (comma-separated)" oninput="updateAttrDisplay()">
-        <div class="field-hint">Separate multiple values with commas.</div>
-      </div>
-    </div>
-
-    <div class="selected-attrs-display" id="selectedAttrsDisplay">
-      <div class="attrs-label">Selected attributes</div>
-      <div id="attributeTags" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.375rem;"></div>
-    </div>
-
-    <div style="display:flex;gap:0.75rem;margin-bottom:1rem;">
-      <button class="btn btn-primary-filled btn-block" type="button" onclick="autoDetect()" style="flex:1;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        Auto-detect from dataset
-      </button>
-      <button class="btn btn-danger-outline btn-block" type="button" onclick="resetAttrs()" style="flex:1;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        Clear All
-      </button>
-    </div>
-
-    <div class="warning-banner" id="proxyWarning" style="display:none;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span><strong>Proxy variables may be present.</strong> Some attributes can correlate with others &#8212; review before submitting.</span>
-    </div>
-  </section>
-
-  <!-- Fairness Priorities -->
-  <section class="section-block">
-    <div class="card-header">
-      <div class="card-icon amber">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
-      </div>
-      <span class="card-title">Rank Fairness Dimensions</span>
-    </div>
-    <p class="section-desc">Drag to reorder &#xB7; Adjust sliders to set weights (min 5%)</p>
-
-    <div class="ranking-list" id="rankingList">
-      <div class="ranking-item" draggable="true" data-value="individualFairness"><span class="rank-number">1</span><span class="dimension-name">Individual Fairness</span><div class="weight-bar"><div class="weight-fill" style="width:25%"></div></div><span class="weight-value">25%</span><input type="range" class="weight-slider" min="5" max="100" value="25" oninput="updateWeights()"></div>
-      <div class="ranking-item" draggable="true" data-value="groupFairness"><span class="rank-number">2</span><span class="dimension-name">Group Fairness</span><div class="weight-bar"><div class="weight-fill" style="width:20%"></div></div><span class="weight-value">20%</span><input type="range" class="weight-slider" min="5" max="100" value="20" oninput="updateWeights()"></div>
-      <div class="ranking-item" draggable="true" data-value="demographicParity"><span class="rank-number">3</span><span class="dimension-name">Demographic Parity</span><div class="weight-bar"><div class="weight-fill" style="width:15%"></div></div><span class="weight-value">15%</span><input type="range" class="weight-slider" min="5" max="100" value="15" oninput="updateWeights()"></div>
-      <div class="ranking-item" draggable="true" data-value="calibrationError"><span class="rank-number">4</span><span class="dimension-name">Calibration</span><div class="weight-bar"><div class="weight-fill" style="width:12%"></div></div><span class="weight-value">12%</span><input type="range" class="weight-slider" min="5" max="100" value="12" oninput="updateWeights()"></div>
-      <div class="ranking-item" draggable="true" data-value="disparateImpact"><span class="rank-number">5</span><span class="dimension-name">Disparate Impact</span><div class="weight-bar"><div class="weight-fill" style="width:10%"></div></div><span class="weight-value">10%</span><input type="range" class="weight-slider" min="5" max="100" value="10" oninput="updateWeights()"></div>
-      <div class="ranking-item" draggable="true" data-value="counterfactual"><span class="rank-number">6</span><span class="dimension-name">Counterfactual</span><div class="weight-bar"><div class="weight-fill" style="width:10%"></div></div><span class="weight-value">10%</span><input type="range" class="weight-slider" min="5" max="100" value="10" oninput="updateWeights()"></div>
-      <div class="ranking-item" draggable="true" data-value="intersectional"><span class="rank-number">7</span><span class="dimension-name">Intersectional</span><div class="weight-bar"><div class="weight-fill" style="width:8%"></div></div><span class="weight-value">8%</span><input type="range" class="weight-slider" min="5" max="100" value="8" oninput="updateWeights()"></div>
-    </div>
-
-    <div class="weight-summary">
-      <div class="weight-summary-header"><span>Total Weight:</span><span class="weight-summary-total" id="totalWeight">100%</span></div>
-      <div class="weight-grid">
-        <div class="weight-stat"><div class="weight-stat-label">Highest</div><div class="weight-stat-name" id="highestDim">Individual Fairness</div><div class="weight-stat-val" id="highestVal">25%</div></div>
-        <div class="weight-stat low"><div class="weight-stat-label">Lowest</div><div class="weight-stat-name" id="lowestDim">Intersectional</div><div class="weight-stat-val" id="lowestVal">8%</div></div>
-      </div>
-    </div>
-
-    <div style="display:flex;gap:0.75rem;">
-      <button class="btn btn-danger-outline" type="button" onclick="resetRanking()" style="flex:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>Reset to Default</button>
-      <button class="btn btn-primary-filled" type="button" onclick="normalizeWeights()" style="flex:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Normalize Weights</button>
-    </div>
-    <div style="margin-top:0.875rem;font-size:0.8125rem;color:var(--muted);display:flex;align-items:center;gap:0.375rem;">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      Each dimension gets at least 5%. Click Normalize to distribute proportionally.
-    </div>
-  </section>
-
-  <!-- Report Type -->
-  <section class="section-block">
-    <div class="card-header">
-      <div class="card-icon purple">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      </div>
-      <span class="card-title">Report Type</span>
-    </div>
-    <p class="section-desc">Choose the format for your fairness report</p>
-
-    <div class="report-toggle">
-      <div class="report-card" id="reportDev" onclick="selectReport('developer')">
-        <div class="report-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A56FF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-        <h3 class="report-title">Developer</h3><p class="report-desc">Technical metrics &amp; detailed analysis</p>
-        <div class="report-features"><span class="feature-tag">ML Metrics</span><span class="feature-tag">SHAP Analysis</span><span class="feature-tag">JSON Output</span></div>
-        <div class="selection-indicator"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-      </div>
-      <div class="report-card" id="reportReg" onclick="selectReport('regulator')">
-        <div class="report-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-        <h3 class="report-title">Regulator</h3><p class="report-desc">Compliance &amp; audit documentation</p>
-        <div class="report-features"><span class="feature-tag">Legal Docs</span><span class="feature-tag">Compliance</span><span class="feature-tag">Evidence</span></div>
-        <div class="selection-indicator"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-      </div>
-      <div class="report-card" id="reportUser" onclick="selectReport('enduser')">
-        <div class="report-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-        <h3 class="report-title">End-user</h3><p class="report-desc">Plain language explanations</p>
-        <div class="report-features"><span class="feature-tag">Simple Text</span><span class="feature-tag">FAQ</span><span class="feature-tag">Visual</span></div>
-        <div class="selection-indicator"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-      </div>
-    </div>
-
-    <div id="selectedReportDisplay" style="display:none;margin-top:1rem;padding:1rem 1.125rem;background:var(--accent-dim);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;">
-      <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);margin-bottom:0.2rem;">Selected</div>
-      <div id="selectedReportName" style="font-size:0.9375rem;font-weight:600;color:var(--ink);"></div>
-    </div>
-
-    <div class="checkbox-wrapper" style="margin-top:1.5rem;">
-      <input type="checkbox" id="generateAllReports" onchange="toggleGenerateAll()">
-      <label for="generateAllReports" style="cursor:pointer;"><strong>Generate all report types</strong> &#8212; gives you all 3 formats (~5&#8211;7 min)</label>
-    </div>
-
-    <div id="allReportsWarning" style="display:none;margin-top:0.875rem;padding:0.875rem;background:#FFFBEB;border-left:3px solid var(--warning);border-radius:0 8px 8px 0;font-size:0.875rem;color:#92400E;">
-      Generating all reports takes approximately 5&#8211;7 minutes.
-    </div>
-  </section>
-
-  <!-- Submit -->
-  <div class="submit-section">
-    <button class="submit-btn" id="submitBtn" type="button" onclick="analyzeFairness()" disabled>ANALYZE FAIRNESS &#x2192;</button>
-    <p class="eta-text" id="etaText">Upload a dataset file to continue</p>
-  </div>
 </main>
 
 <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
@@ -428,9 +1430,9 @@ let _toastTimer = null;
 function toast(msg, type = 'info') {
     const el = document.getElementById('toast');
     const icons = {
-        success: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-        error:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
-        info:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+        success: '<i class="fas fa-check-circle"></i>',
+        error:   '<i class="fas fa-exclamation-circle"></i>',
+        info:    '<i class="fas fa-info-circle"></i>',
     };
     document.getElementById('toastIcon').innerHTML = icons[type] || icons.info;
     document.getElementById('toastMsg').textContent = msg;
@@ -446,8 +1448,8 @@ function setStatus(which, type, msg) {
     const txt = document.getElementById(which + 'StatusText');
     el.className = 'file-status ' + type;
     ico.innerHTML = type === 'uploading' ? '<div class="upload-spinner"></div>'
-                  : type === 'success'   ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
-                  : type === 'error'     ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' : '';
+                  : type === 'success'   ? '<i class="fas fa-check-circle"></i>'
+                  : type === 'error'     ? '<i class="fas fa-exclamation-circle"></i>' : '';
     txt.textContent = msg;
 }
 
@@ -583,7 +1585,7 @@ function updateAttrDisplay() {
     } else {
         display.style.display = 'block';
         document.getElementById('attributeTags').innerHTML =
-            attrs.map(v => '<span class="attr-tag">' + v + '</span>').join('');
+            attrs.map(v => '<span class="attr-tag"><i class="fas fa-tag"></i> ' + v + '</span>').join('');
     }
 }
 
@@ -598,7 +1600,7 @@ function autoDetect() {
         if (S.columns.some(c => kws.some(k => c.toLowerCase().includes(k)))) { cb.checked = true; n++; }
     });
     updateAttrDisplay();
-    if (n) { document.getElementById('proxyWarning').style.display = 'block'; toast('Auto-detected ' + n + ' attribute(s)', 'success'); }
+    if (n) { document.getElementById('proxyWarning').style.display = 'flex'; toast('Auto-detected ' + n + ' attribute(s)', 'success'); }
     else   { toast('No matching attributes in dataset columns', 'info'); }
 }
 
@@ -685,7 +1687,7 @@ function selectReport(type) {
 
 function toggleGenerateAll() {
     const on = document.getElementById('generateAllReports').checked;
-    document.getElementById('allReportsWarning').style.display = on ? 'block' : 'none';
+    document.getElementById('allReportsWarning').style.display = on ? 'flex' : 'none';
     if (on) {
         S.selectedReport = 'all';
         document.querySelectorAll('.report-card').forEach(c => c.classList.add('selected'));
@@ -709,7 +1711,7 @@ async function analyzeFairness() {
    
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.textContent = 'Starting analysis…';
+    btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Starting analysis…';
     document.getElementById('globalError').style.display = 'none';
 
     try {
@@ -747,7 +1749,7 @@ async function analyzeFairness() {
 
     } catch (err) {
         btn.disabled = false;
-        btn.textContent = 'ANALYZE FAIRNESS →';
+        btn.innerHTML = '<i class="fas fa-play-circle"></i> ANALYZE FAIRNESS →';
         document.getElementById('globalErrorMsg').textContent = err.message;
         document.getElementById('globalError').style.display = 'block';
         toast(err.message, 'error');
@@ -757,6 +1759,16 @@ async function analyzeFairness() {
 document.addEventListener('DOMContentLoaded', () => {
     wireDropZone('datasetDropZone', 'datasetFileInput', uploadDataset);
     refreshSubmitState();
+    
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
 });
 </script>
 </body>
