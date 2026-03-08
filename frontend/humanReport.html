@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human-Readable Report — Fairtrust AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #4F46E5; --primary-soft: #EEF2FF;
+            --success: #059669; --success-light: #D1FAE5;
+            --warning: #D97706; --warning-light: #FEF3C7;
+            --danger: #DC2626; --danger-light: #FEE2E2;
+            --bg: #FAFBFC; --surface: #FFFFFF;
+            --text: #1E293B; --text-muted: #64748B; --border: #E2E8F0;
+        }
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: linear-gradient(180deg, var(--bg) 0%, #F1F5F9 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1rem;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Back link */
+        .back-bar { width: 100%; max-width: 640px; margin-bottom: 1rem; font-size: 0.875rem; }
+        .back-bar a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .back-bar a:hover { text-decoration: underline; }
+
+        .report-container {
+            max-width: 640px; width: 100%;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 2.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.07), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+        .section-spacer { margin-bottom: 2.5rem; }
+
+        /* State card */
+        .state-card { text-align: center; padding: 2rem 0; }
+        .state-card h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .state-card p { color: var(--text-muted); margin-bottom: 1.5rem; }
+
+        /* Header */
+        .report-header { text-align: center; margin-bottom: 2.5rem; }
+        .outcome-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .outcome-fair     { color: var(--success); }
+        .outcome-partial  { color: var(--warning); }
+        .outcome-concern  { color: var(--danger); }
+        .outcome-sub { color: var(--text-muted); font-size: 0.9375rem; margin-bottom: 0.75rem; }
+        .confidence-badge {
+            display: inline-block; padding: 0.35rem 1rem;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 999px; font-size: 0.875rem; color: var(--text-muted);
+        }
+
+        /* Factor list */
+        .explanation-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; }
+        .factor-list { list-style: none; }
+        .factor-item {
+            display: flex; align-items: flex-start; gap: 1rem;
+            padding: 1rem; background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; margin-bottom: 0.75rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .factor-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79,70,229,0.08); border-color: var(--primary); }
+        .factor-icon {
+            width: 40px; height: 40px; background: var(--primary-soft); color: var(--primary);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; flex-shrink: 0;
+        }
+        .factor-icon.warning { background: var(--warning-light); color: var(--warning); }
+        .factor-details { flex: 1; }
+        .factor-name { font-weight: 600; font-size: 0.9375rem; }
+        .factor-detail { font-size: 0.8125rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.5; }
+        .factor-status {
+            font-size: 1rem; font-weight: 700; width: 32px; height: 32px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; margin-left: auto; align-self: center;
+        }
+        .factor-status.approved { color: var(--success); background: var(--success-light); }
+        .factor-status.rejected { color: var(--danger); background: var(--danger-light); }
+
+        /* Bias indicators */
+        .bias-check {
+            background: var(--warning-light); border: 1px solid #F59E0B;
+            border-radius: 12px; padding: 1.5rem; margin-bottom: 2.5rem;
+        }
+        .bias-check.clean { background: var(--success-light); border-color: #6EE7B7; }
+        .bias-icon { font-size: 1.75rem; margin-bottom: 0.4rem; }
+        .bias-title { font-size: 1.0625rem; font-weight: 600; margin-bottom: 0.75rem; color: #92400E; }
+        .bias-check.clean .bias-title { color: var(--success); }
+        .bias-list { list-style: none; }
+        .bias-list li {
+            position: relative; padding-left: 1.25rem;
+            font-size: 0.875rem; color: #92400E; margin-bottom: 0.5rem; line-height: 1.6;
+        }
+        .bias-list li:last-child { margin-bottom: 0; }
+        .bias-list li::before { content: '▸'; position: absolute; left: 0; font-weight: 700; color: var(--warning); }
+        .bias-check.clean .bias-list li { color: var(--success); }
+        .bias-check.clean .bias-list li::before { color: var(--success); }
+
+        /* What this means */
+        .action-section { margin-bottom: 2.5rem; }
+        .action-summary { color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9375rem; line-height: 1.6; }
+        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .action-card {
+            background: var(--surface); padding: 1.25rem 1rem;
+            border-radius: 10px; text-align: center; border: 1px solid var(--border);
+            transition: all 0.2s ease-in-out;
+        }
+        .action-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(79,70,229,0.08); border-color: var(--primary); }
+        .action-icon { font-size: 1.75rem; margin-bottom: 0.6rem; line-height: 1; }
+        .action-card h3 { font-size: 0.9375rem; font-weight: 600; margin-bottom: 0.3rem; }
+        .action-text { color: var(--text-muted); font-size: 0.8125rem; line-height: 1.4; }
+
+        /* Recommendations */
+        .recs-section { margin-bottom: 0.5rem; }
+        .print-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            width: 100%; padding: 0.85rem; background: var(--primary); color: white;
+            border: none; border-radius: 8px; font-size: 0.9375rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; margin-top: 1.5rem; font-family: inherit;
+        }
+        .print-btn:hover { background: #4338CA; }
+
+        .btn { padding: 0.65rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s; border: none; font-family: inherit; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #4338CA; }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .back-bar { display: none; }
+            .print-btn { display: none; }
+            .report-container { box-shadow: none; border: none; }
+        }
+        @media (max-width: 600px) {
+            .report-container { padding: 1.25rem; }
+            .outcome-title { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="back-bar" id="backBar"></div>
+
+    <div class="report-container" id="app">
+        <div class="state-card">
+            <h2>Loading report…</h2>
+            <p>Fetching plain-language summary.</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000';
+
+        function renderNoData(msg) {
+            document.getElementById('app').innerHTML = `
+                <div class="state-card">
+                    <h2>No report found</h2>
+                    <p>${msg || 'Complete an evaluation first.'}</p>
+                    <a href="upload.html" class="btn btn-primary" style="display:inline-flex;margin-top:0.5rem">Start evaluation</a>
+                </div>`;
+        }
+
+        // ── Section renderers ─────────────────────────────────────────────────
+
+        function renderHeader(summary, score) {
+            const outcomeClass = {
+                FAIR:    'outcome-fair',
+                PARTIAL: 'outcome-partial',
+                CONCERN: 'outcome-concern',
+            }[summary.outcome] || 'outcome-partial';
+
+            return `
+            <header class="report-header">
+                <div class="outcome-title ${outcomeClass}">${summary.icon} ${summary.verdict}</div>
+                <p class="outcome-sub">${summary.sub}</p>
+                <span class="confidence-badge">Plain Language Summary &nbsp;·&nbsp; Score: ${score.toFixed(2)}</span>
+            </header>`;
+        }
+
+        function renderFactors(items) {
+            const rows = items.map(f => `
+                <li class="factor-item">
+                    <div class="factor-icon ${f.icon_style === 'warning' ? 'warning' : ''}">${f.icon}</div>
+                    <div class="factor-details">
+                        <div class="factor-name">${f.name}</div>
+                        <div class="factor-detail">${f.detail}</div>
+                    </div>
+                    <div class="factor-status ${f.status}">${f.status_label}</div>
+                </li>`).join('');
+
+            return `
+            <section class="section-spacer">
+                <h2 class="explanation-title">Model Fairness Checks</h2>
+                <ul class="factor-list">${rows}</ul>
+            </section>`;
+        }
+
+        function renderBiasIndicators(indicators) {
+            const isClean = indicators.length === 1 && indicators[0].title.includes('No Major');
+            const cardClass = isClean ? 'bias-check clean' : 'bias-check';
+            const icon  = isClean ? '✅' : '🔍';
+            const title = isClean ? 'No Major Bias Indicators Found' : 'Bias Indicators Identified';
+
+            const listItems = indicators.map(ind => `
+                <li><strong>${ind.title}:</strong> ${ind.detail}</li>`).join('');
+
+            return `
+            <section class="${cardClass}">
+                <div class="bias-icon">${icon}</div>
+                <div class="bias-title">${title}</div>
+                <ul class="bias-list">${listItems}</ul>
+            </section>`;
+        }
+
+        function renderWhatThisMeans(wtm) {
+            const cards = (wtm.action_cards || []).map(c => `
+                <div class="action-card">
+                    <div class="action-icon">${c.icon}</div>
+                    <h3>${c.title}</h3>
+                    <div class="action-text">${c.text}</div>
+                </div>`).join('');
+
+            return `
+            <div class="action-section">
+                <h2 class="explanation-title">What this means</h2>
+                <p class="action-summary">${wtm.summary}</p>
+                <div class="action-grid">${cards}</div>
+            </div>`;
+        }
+
+        function renderRecommendations(recs) {
+            const rows = recs.map(r => `
+                <li class="factor-item">
+                    <div class="factor-icon">${r.icon}</div>
+                    <div class="factor-details">
+                        <div class="factor-name">${r.title}</div>
+                        <div class="factor-detail">${r.detail}</div>
+                    </div>
+                </li>`).join('');
+
+            return `
+            <section class="recs-section">
+                <h2 class="explanation-title">Recommended Improvements</h2>
+                <ul class="factor-list">${rows}</ul>
+                <button class="print-btn" onclick="window.print()">🖨️ Print Report</button>
+            </section>`;
+        }
+
+        // ── Full render ───────────────────────────────────────────────────────
+        function renderReport(data, evalId) {
+            document.getElementById('app').innerHTML =
+                renderHeader(data.overall_summary, data.ethical_score) +
+                renderFactors(data.factor_items || []) +
+                renderBiasIndicators(data.bias_indicators || []) +
+                renderWhatThisMeans(data.what_this_means || {}) +
+                renderRecommendations(data.recommendations || []);
+
+            // Back bar
+            const backLink = `dashboard.html${evalId ? '?eval_id=' + evalId : ''}`;
+            document.getElementById('backBar').innerHTML =
+                `<a href="${backLink}">← Back to Dashboard</a>`;
+        }
+
+        // ── Init ──────────────────────────────────────────────────────────────
+        (async function init() {
+            const evalId = new URLSearchParams(location.search).get('eval_id')
+                        || sessionStorage.getItem('eval_id');
+
+            if (!evalId) { renderNoData('No evaluation ID found.'); return; }
+
+            try {
+                const res  = await fetch(`${API_BASE}/report/enduser/${evalId}`);
+                const data = await res.json();
+
+                if (res.ok && data.status === 'complete') {
+                    renderReport(data, evalId);
+                } else {
+                    throw new Error(data.error || 'not complete');
+                }
+            } catch (_) {
+                // Fallback: build minimal view from page3 cached result
+                const cached = sessionStorage.getItem('eval_result');
+                if (cached) {
+                    const raw      = JSON.parse(cached);
+                    const fairness = raw.fairness || {};
+                    const score    = raw.ethical_score || 0;
+
+                    // Minimal client-side shaping
+                    const outcome = score >= 0.80 ? 'FAIR' : score >= 0.65 ? 'PARTIAL' : 'CONCERN';
+                    const icons   = { FAIR: '✅', PARTIAL: '⚠️', CONCERN: '🔴' };
+                    const verdicts = {
+                        FAIR:    'This model is performing fairly.',
+                        PARTIAL: 'This model has some fairness concerns.',
+                        CONCERN: 'This model has significant fairness issues.',
+                    };
+
+                    renderReport({
+                        ethical_score:   score,
+                        overall_summary: { verdict: verdicts[outcome], sub: 'See details below.', outcome, icon: icons[outcome] },
+                        factor_items: [
+                            { icon: '📊', icon_style: 'normal', name: 'Individual Fairness', detail: `Score: ${fairness.individualFairness ?? '—'}`, status: (fairness.individualFairness ?? 0) >= 0.8 ? 'approved' : 'rejected', status_label: (fairness.individualFairness ?? 0) >= 0.8 ? '✓' : '!' },
+                            { icon: '👥', icon_style: 'normal', name: 'Group Fairness',      detail: `Score: ${fairness.groupFairness ?? '—'}`,      status: (fairness.groupFairness ?? 0) >= 0.8      ? 'approved' : 'rejected', status_label: (fairness.groupFairness ?? 0) >= 0.8 ? '✓' : '!' },
+                            { icon: '📉', icon_style: 'normal', name: 'Disparate Impact',    detail: `Score: ${fairness.disparateImpact ?? '—'}`,     status: (fairness.disparateImpact ?? 0) >= 0.8    ? 'approved' : 'rejected', status_label: (fairness.disparateImpact ?? 0) >= 0.8 ? '✓' : '!' },
+                        ],
+                        bias_indicators: [{ title: 'Evaluation Complete', detail: `Ethical score: ${score}` }],
+                        what_this_means: { summary: `The model received an ethical score of ${score}.`, action_cards: [] },
+                        recommendations: [{ icon: '✅', title: 'Continue monitoring', detail: 'Re-evaluate as new data is collected.' }],
+                    }, evalId);
+                    return;
+                }
+                renderNoData('Could not load end-user report.');
+            }
+        })();
+    </script>
+</body>
+</html>

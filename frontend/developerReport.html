@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Report — Fairtrust AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #4F46E5; --primary-soft: #EEF2FF;
+            --success: #059669; --success-light: #D1FAE5;
+            --warning: #D97706; --warning-light: #FEF3C7;
+            --danger: #DC2626; --danger-light: #FEE2E2;
+            --bg: #FAFBFC; --surface: #FFFFFF;
+            --text: #1E293B; --text-muted: #64748B; --border: #E2E8F0;
+        }
+        body { font-family: 'DM Sans', -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+
+        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
+        nav { max-width: 1100px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.25rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.9375rem; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--text); }
+        .nav-links a.active { color: var(--primary); }
+
+        .developer-report { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .report-header h1 { font-size: 1.375rem; font-weight: 600; }
+        .report-meta { font-size: 0.8125rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .export-buttons { display: flex; gap: 0.75rem; }
+
+        .btn { padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s; border: none; font-family: inherit; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #4338CA; }
+        .btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+        .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* State card */
+        .state-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3rem 2rem; text-align: center; }
+        .state-card h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .state-card p { color: var(--text-muted); font-size: 0.9375rem; margin-bottom: 1.5rem; }
+
+        /* Sections */
+        .shap-section, .accordion-section, .performance-section {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;
+        }
+        .section-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; }
+
+        /* SHAP chart */
+        .shap-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        .shap-plot { background: var(--bg); border-radius: 8px; padding: 1rem; border: 1px solid var(--border); min-height: 260px; display: flex; flex-direction: column; justify-content: flex-end; }
+        .shap-bars { display: flex; align-items: flex-end; gap: 4px; height: 220px; }
+        .shap-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .shap-bar { width: 100%; background: var(--primary); border-radius: 4px 4px 0 0; transition: height 0.5s ease; min-height: 4px; }
+        .shap-bar-label { font-size: 0.6rem; color: var(--text-muted); text-align: center; writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); max-height: 60px; overflow: hidden; }
+        .feature-controls { display: flex; flex-direction: column; gap: 0.75rem; }
+        .feature-controls h3 { font-size: 0.9375rem; font-weight: 600; }
+        .feature-list { list-style: none; }
+        .feature-list li { display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-val { font-weight: 600; color: var(--primary); font-size: 0.8125rem; }
+        .shap-meta { margin-top: 0.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .shap-chip { padding: 0.3rem 0.7rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 0.8rem; }
+        .shap-chip span { font-weight: 600; color: var(--primary); }
+
+        /* Accordion */
+        .accordion-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.5rem; overflow: hidden; }
+        .accordion-header { padding: 1rem 1.25rem; background: var(--bg); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; user-select: none; }
+        .accordion-header:hover { background: var(--primary-soft); }
+        .accordion-title { display: flex; align-items: center; gap: 0.75rem; font-size: 0.9375rem; font-weight: 500; }
+        .dim-score-badge { padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8125rem; font-weight: 600; }
+        .dim-score-badge.success { background: var(--success-light); color: var(--success); }
+        .dim-score-badge.warning { background: var(--warning-light); color: var(--warning); }
+        .accordion-arrow { transition: transform 0.2s; font-size: 0.75rem; color: var(--text-muted); }
+        .accordion-arrow.open { transform: rotate(180deg); }
+        .accordion-content { display: none; padding: 1.25rem; font-size: 0.875rem; border-top: 1px solid var(--border); }
+        .accordion-content.active { display: block; }
+        .accordion-content p { color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.6; }
+        .accordion-content strong { color: var(--text); }
+
+        /* Tables */
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.875rem; }
+        .comparison-table th { background: var(--bg); padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.8125rem; color: var(--text-muted); }
+        .comparison-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
+        .comparison-table tr:last-child td { border-bottom: none; }
+        .comparison-table tr:hover td { background: var(--bg); }
+        .tag-pass    { display: inline-block; padding: 0.15rem 0.45rem; border-radius: 4px; background: var(--success-light); color: var(--success); font-size: 0.75rem; font-weight: 600; }
+        .tag-warning { display: inline-block; padding: 0.15rem 0.45rem; border-radius: 4px; background: var(--warning-light); color: var(--warning); font-size: 0.75rem; font-weight: 600; }
+        .tag-fail    { display: inline-block; padding: 0.15rem 0.45rem; border-radius: 4px; background: var(--danger-light); color: var(--danger); font-size: 0.75rem; font-weight: 600; }
+
+        /* Metrics grid */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin: 0.75rem 0; }
+        .metric-card { background: var(--bg); padding: 0.75rem; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+        .metric-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+        .metric-value { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
+
+        /* Performance */
+        .performance-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        .perf-section-title { font-size: 0.9375rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .confusion-matrix { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .matrix-cell { background: var(--surface); padding: 1.25rem; text-align: center; }
+        .matrix-cell .mc-value { font-size: 1.5rem; font-weight: 700; }
+        .matrix-cell .mc-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .matrix-cell.tp { background: #ECFDF5; }
+        .matrix-cell.tn { background: #ECFDF5; }
+        .matrix-cell.fp { background: #FEF2F2; }
+        .matrix-cell.fn { background: #FEF2F2; }
+        .na-text { color: var(--text-muted); font-size: 0.875rem; font-style: italic; }
+
+        @media (max-width: 768px) {
+            .shap-grid { grid-template-columns: 1fr; }
+            .performance-grid { grid-template-columns: 1fr; }
+            .report-header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Fairtrust AI Framework</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="upload.html">Upload</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="docs.html">Docs</a>
+                <a href="admin.html">Admin</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="developer-report" id="app">
+        <div class="state-card">
+            <h2>Loading report…</h2>
+            <p>Fetching developer data.</p>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000';
+
+        // ── Helpers ───────────────────────────────────────────────────────────
+        function fmt(v, decimals = 4) {
+            return v != null ? Number(v).toFixed(decimals) : '—';
+        }
+
+        function tagClass(status) {
+            const s = (status || '').toUpperCase();
+            if (s === 'PASS')    return 'tag-pass';
+            if (s === 'WARNING') return 'tag-warning';
+            return 'tag-fail';
+        }
+
+        function dimBadge(score) {
+            return score >= 0.80
+                ? `<span class="dim-score-badge success">${fmt(score, 2)}</span>`
+                : `<span class="dim-score-badge warning">${fmt(score, 2)}</span>`;
+        }
+
+        // ── Render: no data ───────────────────────────────────────────────────
+        function renderNoData(msg) {
+            document.getElementById('app').innerHTML = `
+                <div class="state-card">
+                    <h2>No report found</h2>
+                    <p>${msg || 'Complete an evaluation first.'}</p>
+                    <a href="upload.html" class="btn btn-primary" style="display:inline-flex;margin-top:0.5rem">Start evaluation</a>
+                </div>`;
+        }
+
+        // ── SHAP section ──────────────────────────────────────────────────────
+        function renderShap(shap) {
+            const features = shap.feature_importance || [];
+            const top8     = features.slice(0, 8);
+            const maxVal   = top8.length ? top8[0].shap_value : 1;
+
+            const bars = top8.map(f => {
+                const pct = Math.round((f.shap_value / maxVal) * 100);
+                return `
+                <div class="shap-bar-wrap">
+                    <div class="shap-bar" style="height:${pct}%"></div>
+                    <div class="shap-bar-label">${f.feature}</div>
+                </div>`;
+            }).join('');
+
+            const listItems = features.slice(0, 10).map(f =>
+                `<li>
+                    <span>${f.feature}</span>
+                    <span class="feature-val">${fmt(f.shap_value, 5)}</span>
+                </li>`
+            ).join('');
+
+            return `
+            <section class="shap-section">
+                <h2 class="section-title">SHAP Analysis</h2>
+                <div class="shap-grid">
+                    <div>
+                        <div class="shap-plot">
+                            <div class="shap-bars">${bars || '<p class="na-text">No SHAP data available.</p>'}</div>
+                        </div>
+                        <div class="shap-meta">
+                            <div class="shap-chip">Top feature: <span>${shap.top_feature || '—'}</span></div>
+                            <div class="shap-chip">Max SHAP: <span>${fmt(shap.shap_max, 5)}</span></div>
+                            <div class="shap-chip">Min SHAP: <span>${fmt(shap.shap_min, 5)}</span></div>
+                            <div class="shap-chip">Stability: <span>${fmt(shap.feature_stability, 4)}</span></div>
+                        </div>
+                    </div>
+                    <div class="feature-controls">
+                        <h3>Feature Importance</h3>
+                        <ul class="feature-list">${listItems || '<li class="na-text">No data</li>'}</ul>
+                        <button class="btn btn-secondary" onclick="downloadSHAP()">Download SHAP values</button>
+                    </div>
+                </div>
+            </section>`;
+        }
+
+        // ── Dimension accordions ──────────────────────────────────────────────
+        function renderDimensionDetail(dim) {
+            const d = dim.detail || {};
+
+            switch (dim.id) {
+                case 1: // Individual Fairness
+                    return `
+                        <p>${d.description || ''}</p>
+                        <div class="metrics-grid">
+                            <div class="metric-card"><div class="metric-label">Consistency</div><div class="metric-value">${d.consistency_pct ?? '—'}%</div></div>
+                            <div class="metric-card"><div class="metric-label">Violation Rate</div><div class="metric-value">${dim.violation_rate ?? '—'}%</div></div>
+                            <div class="metric-card"><div class="metric-label">Method</div><div class="metric-value" style="font-size:0.8rem">KNN k=5</div></div>
+                        </div>`;
+
+                case 2: // Group Fairness
+                    const groups = (d.per_attribute || []).map(g => `
+                        <tr>
+                            <td>${g.attribute}</td>
+                            <td>${fmt(g.equalized_odds_difference, 4)}</td>
+                            <td>${fmt(g.demographic_parity_difference, 4)}</td>
+                            <td>${fmt(g.fairness_score, 4)}</td>
+                        </tr>`).join('') || '<tr><td colspan="4" class="na-text">No attribute data</td></tr>';
+                    return `
+                        <p>${d.description || ''}</p>
+                        <table class="comparison-table">
+                            <thead><tr><th>Attribute</th><th>EOD</th><th>DP Diff</th><th>Score</th></tr></thead>
+                            <tbody>${groups}</tbody>
+                        </table>`;
+
+                case 3: // Demographic Bias
+                    const disps = (d.disparities || []).map(dp => `
+                        <tr>
+                            <td>${dp.attribute}</td>
+                            <td>${dp.gap_pct}%</td>
+                            <td>${fmt(dp.raw_dp_diff, 4)}</td>
+                        </tr>`).join('') || '<tr><td colspan="3" class="na-text">No data</td></tr>';
+                    return `
+                        <p>${d.description || ''}</p>
+                        <div class="metrics-grid">
+                            <div class="metric-card"><div class="metric-label">Raw DP Gap</div><div class="metric-value">${fmt(d.raw_parity_gap, 4)}</div></div>
+                        </div>
+                        <table class="comparison-table">
+                            <thead><tr><th>Attribute</th><th>Gap %</th><th>DP Diff</th></tr></thead>
+                            <tbody>${disps}</tbody>
+                        </table>`;
+
+                case 4: // Calibration
+                    return `
+                        <p>${d.description || ''}</p>
+                        <div class="metrics-grid">
+                            <div class="metric-card"><div class="metric-label">Brier Score</div><div class="metric-value">${fmt(d.brier_score, 4)}</div></div>
+                            <div class="metric-card"><div class="metric-label">Cal. Score</div><div class="metric-value">${fmt(d.calibration_score, 4)}</div></div>
+                        </div>
+                        <p style="margin-top:0.5rem">${d.interpretation || ''}</p>`;
+
+                case 5: // Disparate Impact
+                    const passes = d.passes_80_rule;
+                    return `
+                        <p>${d.description || ''}</p>
+                        <table class="comparison-table">
+                            <tbody>
+                                <tr><td><strong>Impact Ratio</strong></td><td>${fmt(d.impact_ratio, 4)}</td></tr>
+                                <tr><td><strong>Threshold</strong></td><td>${d.threshold}</td></tr>
+                                <tr><td><strong>80% Rule</strong></td><td><span class="${passes ? 'tag-pass' : 'tag-warning'}">${passes ? 'PASS' : 'FAIL'}</span></td></tr>
+                            </tbody>
+                        </table>`;
+
+                case 6: // Counterfactual
+                    return `
+                        <p>${d.description || ''}</p>
+                        <div class="metrics-grid">
+                            <div class="metric-card"><div class="metric-label">Consistency Score</div><div class="metric-value">${fmt(d.consistency_score, 4)}</div></div>
+                        </div>
+                        <p style="margin-top:0.5rem">${d.interpretation || ''}</p>`;
+
+                case 7: // Intersectional
+                    return `
+                        <p>${d.description || ''}</p>
+                        <div class="metrics-grid">
+                            <div class="metric-card"><div class="metric-label">Worst-case Gap</div><div class="metric-value">${fmt(d.worst_case_gap, 4)}</div></div>
+                        </div>
+                        <p style="margin-top:0.5rem">${d.interpretation || ''}</p>`;
+
+                default:
+                    return `<p>${d.description || 'No detail available.'}</p>`;
+            }
+        }
+
+        function renderAccordions(dimensions) {
+            const items = dimensions.map((dim, i) => `
+                <div class="accordion-item" id="dimension${dim.id}">
+                    <div class="accordion-header" onclick="toggleAccordion(this, ${i})">
+                        <div class="accordion-title">
+                            <span>${dim.icon} ${dim.title}</span>
+                            ${dimBadge(dim.score)}
+                        </div>
+                        <span class="accordion-arrow" id="arrow-${i}">▼</span>
+                    </div>
+                    <div class="accordion-content" id="content-${i}">
+                        ${renderDimensionDetail(dim)}
+                    </div>
+                </div>`).join('');
+
+            return `
+            <section class="accordion-section">
+                <h2 class="section-title">Fairness Dimensions Analysis</h2>
+                ${items}
+            </section>`;
+        }
+
+        // ── Model performance section ─────────────────────────────────────────
+        function renderPerformance(perf) {
+            const cm = perf.confusion_matrix || {};
+            const tpVal = cm.true_positives  != null ? cm.true_positives  : null;
+            const fpVal = cm.false_positives != null ? cm.false_positives : null;
+            const fnVal = cm.false_negatives != null ? cm.false_negatives : null;
+            const tnVal = cm.true_negatives  != null ? cm.true_negatives  : null;
+            const hasMatrix = tpVal != null;
+
+            const cmHtml = hasMatrix ? `
+                <div class="confusion-matrix">
+                    <div class="matrix-cell tp"><div class="mc-value">${tpVal}</div><div class="mc-label">True Positives</div></div>
+                    <div class="matrix-cell fp"><div class="mc-value">${fpVal}</div><div class="mc-label">False Positives</div></div>
+                    <div class="matrix-cell fn"><div class="mc-value">${fnVal}</div><div class="mc-label">False Negatives</div></div>
+                    <div class="matrix-cell tn"><div class="mc-value">${tnVal}</div><div class="mc-label">True Negatives</div></div>
+                </div>` : `<p class="na-text">Confusion matrix not available — requires raw count data from evaluation.</p>`;
+
+            return `
+            <section class="performance-section">
+                <h2 class="section-title">Model Performance Metrics</h2>
+                <div class="performance-grid">
+                    <div>
+                        <div class="perf-section-title">Confusion Matrix</div>
+                        ${cmHtml}
+                    </div>
+                    <div>
+                        <div class="perf-section-title">Metrics Summary</div>
+                        <table class="comparison-table">
+                            <tbody>
+                                <tr><td>AUC-ROC</td><td><strong>${fmt(perf.roc_auc, 4)}</strong></td></tr>
+                                <tr><td>Accuracy</td><td><strong>${fmt(perf.accuracy, 4)}</strong></td></tr>
+                                <tr><td>F1-Score</td><td><strong>${fmt(perf.f1_score, 4)}</strong></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>`;
+        }
+
+        // ── Full render ───────────────────────────────────────────────────────
+        function renderReport(data, evalId) {
+            const backLink = `dashboard.html${evalId ? '?eval_id=' + evalId : ''}`;
+            document.getElementById('app').innerHTML = `
+                <div class="report-header">
+                    <div>
+                        <h1>Developer Report — Technical Deep Dive</h1>
+                        <div class="report-meta">
+                            Eval ID: <code>${evalId || '—'}</code> &nbsp;|&nbsp;
+                            Ethical Score: <strong>${fmt(data.ethical_score, 2)}</strong> &nbsp;|&nbsp;
+                            ${data.records ? data.records.toLocaleString() + ' records' : ''}
+                            &nbsp;<a href="${backLink}" style="color:var(--primary);font-weight:600">← Dashboard</a>
+                        </div>
+                    </div>
+                    <div class="export-buttons">
+                        <button class="btn btn-secondary" onclick="downloadJSON()">Download JSON</button>
+                        <button class="btn btn-primary" onclick="downloadModelCard()">Download model card</button>
+                    </div>
+                </div>
+                ${renderShap(data.shap || {})}
+                ${renderAccordions(data.dimensions || [])}
+                ${renderPerformance(data.model_performance || {})}`;
+
+            // Auto-open accordion if hash present (e.g. #dimension3)
+            const hash = window.location.hash;
+            if (hash) {
+                const dimId = parseInt(hash.replace('#dimension', ''));
+                if (!isNaN(dimId)) {
+                    const idx = dimId - 1;
+                    const content = document.getElementById(`content-${idx}`);
+                    const arrow   = document.getElementById(`arrow-${idx}`);
+                    if (content) {
+                        content.classList.add('active');
+                        if (arrow) arrow.classList.add('open');
+                        setTimeout(() => {
+                            document.getElementById(`dimension${dimId}`)?.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
+                    }
+                }
+            }
+        }
+
+        // ── Accordion toggle ──────────────────────────────────────────────────
+        function toggleAccordion(header, idx) {
+            const content = document.getElementById(`content-${idx}`);
+            const arrow   = document.getElementById(`arrow-${idx}`);
+            if (!content) return;
+            content.classList.toggle('active');
+            arrow?.classList.toggle('open');
+        }
+
+        // ── Actions ───────────────────────────────────────────────────────────
+        function downloadSHAP() {
+            const cached = sessionStorage.getItem('eval_result');
+            if (!cached) { alert('No SHAP data available.'); return; }
+            const data = JSON.parse(cached);
+            const blob = new Blob([JSON.stringify(data.shap || {}, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = 'shap_values.json'; a.click();
+        }
+
+        function downloadJSON() {
+            const cached = sessionStorage.getItem('eval_result');
+            if (!cached) { alert('No data to download.'); return; }
+            const blob = new Blob([cached], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = 'developer_report.json'; a.click();
+        }
+
+        function downloadModelCard() {
+            alert('Generating model card PDF…');
+        }
+
+        // ── Init ──────────────────────────────────────────────────────────────
+        (async function init() {
+            const evalId = new URLSearchParams(location.search).get('eval_id')
+                        || sessionStorage.getItem('eval_id');
+
+            if (!evalId) { renderNoData('No evaluation ID found.'); return; }
+
+            try {
+                const res  = await fetch(`${API_BASE}/report/developer/${evalId}`);
+                const data = await res.json();
+
+                if (res.ok && data.status === 'complete') {
+                    renderReport(data, evalId);
+                } else {
+                    throw new Error(data.error || 'not complete');
+                }
+            } catch (_) {
+                // Fallback to cached eval_result from processing
+                const cached = sessionStorage.getItem('eval_result');
+                if (cached) {
+                    const raw = JSON.parse(cached);
+                    // Shape raw eval into the same structure the API returns
+                    renderReport({
+                        ethical_score:    raw.ethical_score,
+                        records:          raw.records,
+                        shap:             raw.shap ? {
+                            top_feature:       raw.shap.topFeature,
+                            shap_max:          raw.shap.shapMax,
+                            shap_min:          raw.shap.shapMin,
+                            feature_stability: raw.shap.featureStability,
+                            feature_importance: Object.entries(raw.shap.feature_importance || {})
+                                .sort((a, b) => b[1] - a[1])
+                                .map(([feature, shap_value]) => ({ feature, shap_value })),
+                        } : {},
+                        dimensions:       [],   // no dimension detail without API
+                        model_performance: raw.model_metrics ? {
+                            accuracy:         raw.model_metrics.accuracy,
+                            f1_score:         raw.model_metrics.f1_score,
+                            roc_auc:          raw.model_metrics.roc_auc,
+                            confusion_matrix: {},
+                        } : {},
+                    }, evalId);
+                    return;
+                }
+                renderNoData('Could not load developer report.');
+            }
+        })();
+    </script>
+</body>
+</html>

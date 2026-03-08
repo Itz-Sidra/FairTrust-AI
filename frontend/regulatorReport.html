@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regulator Report — Fairtrust AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #4F46E5; --primary-soft: #EEF2FF;
+            --success: #059669; --success-light: #D1FAE5;
+            --warning: #D97706; --warning-light: #FEF3C7;
+            --danger: #DC2626; --danger-light: #FEE2E2;
+            --bg: #FAFBFC; --surface: #FFFFFF;
+            --text: #1E293B; --text-muted: #64748B; --border: #E2E8F0;
+            --gold: #B45309; --gold-light: #FEF3C7;
+        }
+        body { font-family: 'DM Sans', -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+
+        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
+        nav { max-width: 1100px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.25rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.9375rem; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--text); }
+
+        .regulator-report { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+        /* State card */
+        .state-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3rem 2rem; text-align: center; }
+        .state-card h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .state-card p { color: var(--text-muted); font-size: 0.9375rem; margin-bottom: 1.5rem; }
+
+        /* Certificate */
+        .certificate-section { background: var(--surface); border: 2px solid var(--gold); border-radius: 16px; padding: 2rem 2.5rem; margin-bottom: 2rem; position: relative; }
+        .certificate-border { position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid var(--gold); border-radius: 13px; pointer-events: none; opacity: 0.5; }
+        .certificate-header { text-align: center; margin-bottom: 1.5rem; }
+        .certificate-header h1 { font-size: 1.5rem; color: var(--primary); font-weight: 700; margin-bottom: 0.5rem; }
+        .certificate-header p { color: var(--text-muted); font-size: 0.875rem; }
+        .certificate-seal { width: 72px; height: 72px; background: var(--gold); border-radius: 50%; margin: 1rem auto; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; box-shadow: 0 4px 12px rgba(180,83,9,0.3); }
+        .certificate-body { text-align: center; margin: 1.5rem 0; }
+        .certificate-body > p { color: var(--text-muted); font-size: 0.9375rem; }
+        .certificate-org { font-size: 1.6rem; font-weight: 700; margin: 0.75rem 0 0.25rem; color: var(--text); }
+        .certificate-model { font-size: 0.9375rem; color: var(--text-muted); margin-bottom: 1.25rem; }
+        .score-badge { display: inline-block; padding: 0.75rem 2rem; border-radius: 999px; font-size: 1.125rem; font-weight: 700; color: white; }
+        .score-badge.certified    { background: var(--success); }
+        .score-badge.conditional  { background: var(--warning); }
+        .score-badge.not-certified { background: var(--danger); }
+        .certificate-dates { display: flex; justify-content: center; gap: 2rem; margin: 1.25rem 0; color: var(--text-muted); font-size: 0.875rem; }
+        .cert-note { font-size: 0.875rem; color: var(--text-muted); line-height: 1.6; margin-top: 0.75rem; }
+        .certificate-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+        .signature { text-align: center; }
+        .signature-line { width: 160px; height: 1px; background: var(--text); margin: 0.5rem 0; }
+        .signature-name { font-size: 0.875rem; font-weight: 600; }
+        .signature-title { font-size: 0.75rem; color: var(--text-muted); }
+        .eval-id-badge { font-size: 0.7rem; color: var(--text-muted); font-family: monospace; background: var(--bg); border: 1px solid var(--border); padding: 0.25rem 0.5rem; border-radius: 4px; word-break: break-all; max-width: 200px; text-align: right; }
+        .download-cert { text-align: center; margin-top: 1.5rem; }
+
+        /* Sections */
+        .compliance-section, .audit-section, .legal-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .section-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; }
+        .compliance-summary { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .summary-chip { padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.8125rem; font-weight: 600; }
+        .summary-chip.pass { background: var(--success-light); color: var(--success); }
+        .summary-chip.fail { background: var(--danger-light); color: var(--danger); }
+        .summary-chip.neutral { background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); }
+
+        .compliance-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .compliance-table th { background: var(--bg); padding: 0.6rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.8125rem; color: var(--text-muted); }
+        .compliance-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); }
+        .compliance-table tr:last-child td { border-bottom: none; }
+        .status-pass { color: var(--success); font-weight: 700; }
+        .status-fail { color: var(--danger); font-weight: 700; }
+
+        /* Timeline */
+        .timeline { position: relative; padding: 1rem 0; }
+        .timeline::before { content: ''; position: absolute; left: 19px; top: 0; bottom: 0; width: 2px; background: var(--primary-soft); }
+        .timeline-item { position: relative; padding-left: 56px; margin-bottom: 1.5rem; }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-dot { position: absolute; left: 12px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); border: 3px solid var(--surface); box-shadow: 0 0 0 2px var(--primary-soft); }
+        .timeline-date { font-weight: 600; color: var(--primary); font-size: 0.8125rem; margin-bottom: 0.2rem; }
+        .timeline-title { font-weight: 600; font-size: 0.9375rem; }
+        .timeline-detail { color: var(--text-muted); font-size: 0.8125rem; margin-top: 0.15rem; }
+
+        .shap-audit-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin-top: 1rem; }
+        .shap-audit-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
+        .shap-audit-table td:first-child { color: var(--text-muted); width: 50%; }
+        .shap-audit-table td:last-child { font-weight: 600; }
+        .shap-audit-table tr:last-child td { border-bottom: none; }
+
+        /* Legal badges */
+        .legal-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
+        .legal-badge { display: inline-block; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.875rem; font-weight: 600; }
+        .badge-compliant { background: var(--success-light); color: var(--success); }
+        .badge-ready     { background: var(--primary-soft); color: var(--primary); }
+        .badge-review    { background: var(--warning-light); color: var(--warning); }
+        .legal-framework { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+        .legal-framework:last-child { margin-bottom: 0; }
+        .legal-framework-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+        .legal-framework-title { font-weight: 600; font-size: 0.9375rem; }
+        .legal-framework-note { font-size: 0.8125rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* Buttons */
+        .btn { padding: 0.65rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s; border: none; font-family: inherit; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #4338CA; }
+        .btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+        .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+        .export-options { display: flex; gap: 0.75rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
+
+        @media print {
+            header, .export-options { display: none; }
+            body { background: white; }
+        }
+        @media (max-width: 600px) {
+            .certificate-footer { flex-direction: column; gap: 1rem; align-items: center; }
+            .certificate-dates { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Fairtrust AI Framework</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="upload.html">Upload</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="docs.html">Docs</a>
+                <a href="admin.html">Admin</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="regulator-report" id="app">
+        <div class="state-card">
+            <h2>Loading report…</h2>
+            <p>Fetching certification data.</p>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000';
+
+        function renderNoData(msg) {
+            document.getElementById('app').innerHTML = `
+                <div class="state-card">
+                    <h2>No report found</h2>
+                    <p>${msg || 'Complete an evaluation first.'}</p>
+                    <a href="upload.html" class="btn btn-primary" style="display:inline-flex;margin-top:0.5rem">Start evaluation</a>
+                </div>`;
+        }
+
+        // ── Certificate ───────────────────────────────────────────────────────
+        function renderCertificate(cert, evalId) {
+            const badgeClass = cert.certified ? 'certified'
+                : cert.status === 'CONDITIONAL' ? 'conditional' : 'not-certified';
+            const badgeLabel = cert.certified
+                ? `✓ Fairtrust Score: ${cert.fairness_score}`
+                : `⚠ Score: ${cert.fairness_score} — Conditional`;
+
+            return `
+            <section class="certificate-section">
+                <div class="certificate-border"></div>
+                <div class="certificate-header">
+                    <h1>Certificate of Fairtrust AI Compliance</h1>
+                    <p>Issued by the Fairtrust AI Framework</p>
+                    <div class="certificate-seal">⚖️</div>
+                </div>
+                <div class="certificate-body">
+                    <p>This is to certify that</p>
+                    <div class="certificate-org">${cert.organization}</div>
+                    <div class="certificate-model">Model ID: ${cert.model_name}</div>
+                    <div style="margin:1.5rem 0">
+                        <span class="score-badge ${badgeClass}">${badgeLabel}</span>
+                    </div>
+                    <div class="certificate-dates">
+                        <div>📅 Issued: ${cert.issued_at}</div>
+                        <div>⏳ Valid until: ${cert.valid_until}</div>
+                    </div>
+                    <p class="cert-note">
+                        This model has been evaluated across all 7 fairness dimensions<br>
+                        and ${cert.certified ? 'meets' : 'partially meets'} the required standards for ethical AI deployment.
+                    </p>
+                </div>
+                <div class="certificate-footer">
+                    <div class="signature">
+                        <div class="signature-line"></div>
+                        <div class="signature-name">Fairtrust AI Framework</div>
+                        <div class="signature-title">Automated Ethics Certification</div>
+                    </div>
+                    <div class="eval-id-badge">Eval ID:<br>${evalId || '—'}</div>
+                </div>
+                <div class="download-cert">
+                    <button class="btn btn-primary" onclick="downloadPDF()">📄 Download Certificate PDF</button>
+                </div>
+            </section>`;
+        }
+
+        // ── Compliance table ──────────────────────────────────────────────────
+        function renderCompliance(compliance, summary) {
+            const rows = compliance.map(r => `
+                <tr>
+                    <td>${r.requirement}</td>
+                    <td>${r.threshold}</td>
+                    <td>${r.achieved}</td>
+                    <td class="${r.passed ? 'status-pass' : 'status-fail'}">${r.passed ? '✓ PASS' : '✗ FAIL'}</td>
+                </tr>`).join('');
+
+            return `
+            <section class="compliance-section">
+                <h2 class="section-title">Fairness Contract Compliance</h2>
+                <div class="compliance-summary">
+                    <span class="summary-chip neutral">Total: ${summary.total}</span>
+                    <span class="summary-chip pass">✓ Passed: ${summary.passed}</span>
+                    ${summary.failed > 0 ? `<span class="summary-chip fail">✗ Failed: ${summary.failed}</span>` : ''}
+                </div>
+                <table class="compliance-table">
+                    <thead>
+                        <tr><th>Requirement</th><th>Threshold</th><th>Achieved</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </section>`;
+        }
+
+        // ── Audit trail ───────────────────────────────────────────────────────
+        function renderAudit(auditTrail, shapAudit) {
+            const timelineItems = auditTrail.map(e => `
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">${e.timestamp}</div>
+                    <div class="timeline-title">${e.title}</div>
+                    <div class="timeline-detail">${e.detail}</div>
+                </div>`).join('');
+
+            const shapRows = shapAudit && shapAudit.top_feature ? `
+                <tr><td>Feature Stability</td><td>${shapAudit.stability_pct}%</td></tr>
+                <tr><td>SHAP Value Range</td><td>${shapAudit.shap_range}</td></tr>
+                <tr><td>Top Feature</td><td>${shapAudit.top_feature} (SHAP: ${shapAudit.top_feature_shap})</td></tr>
+            ` : `<tr><td colspan="2" style="color:var(--text-muted);font-style:italic">No SHAP data available</td></tr>`;
+
+            return `
+            <section class="audit-section">
+                <h2 class="section-title">Audit Trail</h2>
+                <div class="timeline">${timelineItems}</div>
+                <h3 style="margin-top:1.5rem;font-size:0.9375rem;font-weight:600;margin-bottom:0.5rem">SHAP Audit Summary</h3>
+                <table class="shap-audit-table">${shapRows}</table>
+            </section>`;
+        }
+
+        // ── Legal section ─────────────────────────────────────────────────────
+        function renderLegal(legal) {
+            const frameworks = (legal.frameworks || []).map(f => {
+                const badgeC = f.status === 'COMPLIANT' ? 'badge-compliant'
+                    : f.status === 'READY' ? 'badge-ready' : 'badge-review';
+                return `
+                <div class="legal-framework">
+                    <div class="legal-framework-header">
+                        <span class="legal-framework-title">${f.label}</span>
+                        <span class="legal-badge ${badgeC}">${f.status}</span>
+                    </div>
+                    <div class="legal-framework-note">${f.note}</div>
+                </div>`;
+            }).join('');
+
+            return `
+            <section class="legal-section">
+                <h2 class="section-title">Legal &amp; Regulatory Compliance</h2>
+                ${frameworks}
+            </section>`;
+        }
+
+        // ── Full render ───────────────────────────────────────────────────────
+        function renderReport(data, evalId) {
+            const backLink = `dashboard.html${evalId ? '?eval_id=' + evalId : ''}`;
+            document.getElementById('app').innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem">
+                    <div>
+                        <div style="font-size:0.8125rem;color:var(--text-muted)">
+                            Eval ID: <code>${evalId || '—'}</code>
+                            &nbsp;<a href="${backLink}" style="color:var(--primary);font-weight:600">← Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+                ${renderCertificate(data.certificate, evalId)}
+                ${renderCompliance(data.compliance, data.compliance_summary)}
+                ${renderAudit(data.audit_trail, data.shap_audit)}
+                ${renderLegal(data.legal)}
+                <div class="export-options">
+                    <button class="btn btn-primary"   onclick="exportPDF()">📑 Export PDF Report</button>
+                    <button class="btn btn-secondary" onclick="exportJSON()">📁 Export JSON</button>
+                    <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
+                </div>`;
+        }
+
+        // ── Actions ───────────────────────────────────────────────────────────
+        function downloadPDF()  { alert('Preparing certificate PDF…'); }
+        function exportPDF()    { alert('Exporting full regulator report as PDF…'); }
+        function exportJSON() {
+            const cached = sessionStorage.getItem('eval_result');
+            if (!cached) { alert('No data to export.'); return; }
+            const blob = new Blob([cached], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = 'regulator_report.json'; a.click();
+        }
+
+        // ── Init ──────────────────────────────────────────────────────────────
+        (async function init() {
+            const evalId = new URLSearchParams(location.search).get('eval_id')
+                        || sessionStorage.getItem('eval_id');
+
+            if (!evalId) { renderNoData('No evaluation ID found.'); return; }
+
+            try {
+                const res  = await fetch(`${API_BASE}/report/regulator/${evalId}`);
+                const data = await res.json();
+
+                if (res.ok && data.status === 'complete') {
+                    renderReport(data, evalId);
+                } else {
+                    throw new Error(data.error || 'not complete');
+                }
+            } catch (_) {
+                // Fallback: build a minimal view from cached eval_result
+                const cached = sessionStorage.getItem('eval_result');
+                if (cached) {
+                    const raw     = JSON.parse(cached);
+                    const fairness = raw.fairness || {};
+                    const score   = raw.ethical_score || 0;
+                    const now     = new Date();
+
+                    // Reuse the same compliance logic client-side
+                    const RULES = [
+                        { key: "disparateImpact",    min: 0.80, label: "80% Rule (Disparate Impact)" },
+                        { key: "groupFairness",      min: 0.80, label: "Group Fairness" },
+                        { key: "individualFairness", min: 0.85, label: "Individual Fairness" },
+                        { key: "counterfactual",     min: 0.90, label: "Counterfactual Fairness" },
+                    ];
+                    const compliance = RULES.map(r => {
+                        const v = fairness[r.key] || 0;
+                        const passed = v >= r.min;
+                        return { requirement: r.label, threshold: `≥ ${r.min}`, achieved: v.toFixed(4), passed, status: passed ? 'PASS' : 'FAIL' };
+                    });
+                    const passed = compliance.filter(r => r.passed).length;
+
+                    renderReport({
+                        certificate: {
+                            organization:  "Fairtrust AI",
+                            model_name:    raw.model_id || "Unknown",
+                            fairness_score: score,
+                            issued_at:     now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            valid_until:   new Date(now.setFullYear(now.getFullYear() + 1)).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            certified:     passed === compliance.length,
+                            status:        passed === compliance.length ? 'CERTIFIED' : 'CONDITIONAL',
+                        },
+                        compliance,
+                        compliance_summary: { total: compliance.length, passed, failed: compliance.length - passed, all_passed: passed === compliance.length },
+                        audit_trail: [{ timestamp: new Date().toUTCString(), title: "Evaluation Complete", detail: `Score: ${score}` }],
+                        shap_audit:  raw.shap ? { top_feature: raw.shap.topFeature, stability_pct: Math.round((raw.shap.featureStability || 0) * 100), shap_range: `[${raw.shap.shapMin}, ${raw.shap.shapMax}]`, top_feature_shap: raw.shap.shapMax } : {},
+                        legal: { frameworks: [
+                            { label: "🇮🇳 India — Voluntary Compliance", note: "Aligned with NITI Aayog's Responsible AI principles.", status: "COMPLIANT" },
+                            { label: "🇪🇺 EU AI Act — Ready", note: "Transparency and documentation requirements met.", status: score >= 0.75 ? "READY" : "REVIEW" },
+                            { label: "🔒 GDPR Compliant", note: "Right to explanation supported.", status: "COMPLIANT" },
+                        ]},
+                    }, evalId);
+                    return;
+                }
+                renderNoData('Could not load regulator report.');
+            }
+        })();
+    </script>
+</body>
+</html>

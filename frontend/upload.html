@@ -745,6 +745,7 @@ async function analyzeFairness() {
         const evalId = evalData.evaluation_id;
         sessionStorage.setItem('eval_id', evalId);
         sessionStorage.setItem('eval_meta', JSON.stringify(Object.assign({}, payload, {modelId:S.modelId, modelName, modelVersion})));
+        sessionStorage.setItem('report_type', generateAll ? 'all' : (S.selectedReport || 'developer'));
 
         toast('Analysis started! Redirecting…', 'success');
         setTimeout(() => { window.location.href = 'processing.html?eval_id=' + evalId; }, 700);
